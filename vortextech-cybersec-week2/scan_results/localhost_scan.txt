@@ -1,0 +1,7 @@
+PORT     STATE  SERVICE        VERSION
+22/tcp   open   ssh            OpenSSH 9.2p1 Debian 2+deb12u2
+80/tcp   open   http           Apache httpd 2.4.57
+443/tcp  open   https          Apache httpd 2.4.57
+3306/tcp open   mysql          MySQL 8.0.35
+5432/tcp open   postgresql     PostgreSQL DB 15.4
+8080/tcp open   http-proxy     Werkzeug/3.0.1 Python/3.11.6

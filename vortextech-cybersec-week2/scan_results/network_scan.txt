@@ -1,0 +1,13 @@
+192.168.1.1   (Router)
+  80/tcp   open   http
+  443/tcp  open   https
+  8080/tcp open   http-alt
+
+192.168.1.100  (Linux machine)
+  22/tcp   open   ssh
+  5900/tcp open   vnc
+
+192.168.1.101  (Windows PC)
+  135/tcp  open   msrpc
+  139/tcp  open   netbios-ssn
+  445/tcp  open   microsoft-ds
