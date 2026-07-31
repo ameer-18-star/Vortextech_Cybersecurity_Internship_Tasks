@@ -1,0 +1,9 @@
+"/api/BasketItems
+"/api/Cards
+"/api/Complaints
+"/api/Deliverys
+"/api/Hints
+"/api/Products
+"/api/Quantitys
+"/api/SecurityAnswers
+"/api/SecurityQuestions

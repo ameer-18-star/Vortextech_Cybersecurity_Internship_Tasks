@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web Application Security Assessment — OWASP Juice Shop (Local Deployment)</title>
+<style>
+  :root {
+    --bg: #0b0e14;
+    --panel: #10141d;
+    --panel-alt: #141924;
+    --border: #232a38;
+    --text: #d7dce4;
+    --text-dim: #8b93a3;
+    --heading: #f1f4f9;
+    --accent: #5eb3ff;
+    --accent-2: #7ee0c3;
+    --warn: #ffd43b;
+    --code-bg: #0d1117;
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.65; font-size: 16px; }
+  .doc { max-width: 880px; margin: 0 auto; padding: 56px 32px 96px; }
+  .cover { border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 40px; }
+  .cover .eyebrow { text-transform: uppercase; letter-spacing: 0.14em; font-size: 12px; color: var(--accent-2); font-weight: 600; }
+  h1 { font-size: 1.9rem; color: var(--heading); font-weight: 700; letter-spacing: -0.01em; margin: 0.4em 0 0.3em; border-bottom: none !important; }
+  h2 { font-size: 1.4rem; color: var(--heading); font-weight: 700; margin-top: 2.6em; padding-top: 0.6em; border-top: 1px solid var(--border); letter-spacing: -0.01em; }
+  h2:first-of-type { border-top: none; padding-top: 0; }
+  h3 { font-size: 1.1rem; color: var(--accent); font-weight: 700; margin-top: 2.2em; padding: 10px 14px; background: var(--panel-alt); border-left: 3px solid var(--accent); border-radius: 4px; }
+  p { color: var(--text); margin: 0.9em 0; }
+  strong { color: var(--heading); }
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted var(--accent); }
+  a:hover { border-bottom-style: solid; }
+  ul, ol { padding-left: 1.4em; }
+  li { margin: 0.4em 0; }
+  code { font-family: var(--mono); background: var(--code-bg); color: var(--accent-2); padding: 0.15em 0.4em; border-radius: 4px; font-size: 0.88em; border: 1px solid var(--border); }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; overflow-x: auto; margin: 1.2em 0; }
+  pre code { background: none; border: none; padding: 0; color: #c9d1d9; font-size: 0.85em; line-height: 1.6; }
+  table { width: 100%; border-collapse: collapse; margin: 1.4em 0; font-size: 0.92em; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  th, td { padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+  th { background: var(--panel-alt); color: var(--heading); font-weight: 700; font-size: 0.82em; text-transform: uppercase; letter-spacing: 0.05em; }
+  tr:last-child td { border-bottom: none; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 3em 0; }
+  /* Screenshot placeholders — rendered from > blockquotes in the markdown */
+  blockquote {
+    margin: 1em 0;
+    padding: 12px 16px;
+    background: repeating-linear-gradient(45deg, #1a1f2c, #1a1f2c 10px, #171b26 10px, #171b26 20px);
+    border: 1.5px dashed var(--warn);
+    border-radius: 6px;
+    color: var(--warn);
+    font-size: 0.88em;
+    font-family: var(--mono);
+  }
+  blockquote::before { content: "🖼  "; }
+  blockquote p { margin: 0; color: var(--warn); }
+  @media print {
+    body { background: white; color: #111; }
+    .doc { max-width: 100%; padding: 0 20px; }
+    h3 { background: #f2f2f2; border-left-color: #333; color: #111; }
+    pre, code { background: #f5f5f5; color: #111; border-color: #ccc; }
+    a { color: #111; }
+    blockquote { background: #fafafa; border-color: #999; color: #555; }
+    blockquote p { color: #555; }
+  }
+  @media (max-width: 600px) {
+    .doc { padding: 32px 18px 64px; }
+    h1 { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="doc">
+<div class="cover">
+  <div class="eyebrow">Internal Training Deliverable &middot; Self-Hosted Lab Assessment</div>
+</div>
+<h1 id="web-application-security-assessment-report-owasp-juice-shop-local-deployment">Web Application Security Assessment Report — OWASP Juice Shop (Local Deployment)</h1>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#executive-summary">Executive Summary</a></li>
+<li><a href="#approach">Approach</a></li>
+<li><a href="#scope">Scope</a></li>
+<li><a href="#tools-used">Tools Used</a></li>
+<li><a href="#summary-of-findings">Summary of Findings</a></li>
+<li><a href="#remediation-summary">Remediation Summary</a></li>
+<li><a href="#technical-finding-details">Technical Finding Details</a>
+  1. <a href="#1-directory-listing-exposure">Directory Listing Exposure</a>
+  2. <a href="#2-sensitive-information-disclosure-in-client-side-javascript">Sensitive Information Disclosure in Client-Side JavaScript</a>
+  3. <a href="#3-sql-injection-authentication-bypass">SQL Injection Authentication Bypass</a>
+  4. <a href="#4-sql-injection-data-exfiltration-via-search">SQL Injection Data Exfiltration via Search</a>
+  5. <a href="#5-weak-password-hashing-algorithm">Weak Password Hashing Algorithm</a>
+  6. <a href="#6-cross-site-request-forgery-in-password-change">Cross-Site Request Forgery in Password Change</a>
+  7. <a href="#7-dom-based-cross-site-scripting-in-search">DOM-Based Cross-Site Scripting in Search</a>
+  8. <a href="#8-broken-access-control-in-basket-operations">Broken Access Control in Basket Operations</a>
+  9. <a href="#9-improper-input-validation-on-basket-quantity">Improper Input Validation on Basket Quantity</a>
+  10. <a href="#10-file-upload-restriction-bypass">File Upload Restriction Bypass</a>
+  11. <a href="#11-insecure-jwt-design-and-implementation">Insecure JWT Design and Implementation</a></li>
+<li><a href="#author">Author</a></li>
+</ul>
+<hr />
+<h2 id="executive-summary">Executive Summary</h2>
+<p>This report documents a security assessment performed against a <strong>locally deployed instance of OWASP Juice Shop</strong>, an intentionally vulnerable web application maintained by the OWASP Foundation for training and educational purposes. The assessment was carried out as part of an internship training cycle to build hands-on proficiency in identifying, exploiting (in a controlled/authorized lab context), and remediating the vulnerability classes described in the OWASP Top 10.</p>
+<p>Because Juice Shop is deliberately built with known, catalogued weaknesses for training purposes, the objective of this assessment was not vulnerability <em>discovery</em> in the traditional sense, but <strong>demonstration of methodology</strong>: mapping the application's attack surface, exploiting each planted weakness using industry-standard tooling, correctly classifying each finding against CWE and CVSS, and documenting remediation guidance to the standard expected of a professional penetration test report.</p>
+<h3 id="approach">Approach</h3>
+<p>The assessment followed a structured black-box methodology against the running local instance:</p>
+<ol>
+<li><strong>Reconnaissance and attack-surface mapping</strong> — crawling the application through an intercepting proxy to build a complete site map of endpoints, static assets, and client-side code.</li>
+<li><strong>Vulnerability identification</strong> — manual review combined with targeted automated tooling (SQLMap for injection points, Burp Suite's Intruder/Repeater for parameter manipulation) against each mapped endpoint.</li>
+<li><strong>Controlled exploitation</strong> — each identified weakness was exploited to the minimum extent necessary to confirm impact (proof-of-concept), consistent with responsible testing practice even in a self-hosted lab environment.</li>
+<li><strong>Severity classification</strong> — each confirmed finding was scored using the <strong>CVSS v3.1 calculator</strong> and mapped to its corresponding <strong>CWE (Common Weakness Enumeration)</strong> identifier for standardized tracking.</li>
+<li><strong>Remediation research</strong> — for each finding, a concrete, implementable fix is documented, consistent with secure coding practice for the relevant vulnerability class.</li>
+</ol>
+<h3 id="scope">Scope</h3>
+<p>The assessment scope was limited to the OWASP Juice Shop application itself, running locally via Docker, and covered:</p>
+<ul>
+<li>Public-facing application endpoints (REST API and client-rendered routes)</li>
+<li>User registration, authentication, and session handling</li>
+<li>Product search and catalog functionality</li>
+<li>Shopping basket and checkout/order logic</li>
+<li>File upload functionality (customer complaint/feedback form)</li>
+<li>Client-side JavaScript bundles and exposed static assets</li>
+<li>JSON Web Token (JWT) issuance and validation logic</li>
+</ul>
+<p>Out of scope: the underlying Docker host, container runtime, and any infrastructure outside the application container itself, since the objective was <strong>application-layer</strong> security assessment.</p>
+<h3 id="tools-used">Tools Used</h3>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Burp Suite Community Edition</td>
+<td>Intercepting proxy, request manipulation (Repeater), automated payload testing (Intruder)</td>
+</tr>
+<tr>
+<td>SQLMap</td>
+<td>Automated SQL injection detection and database extraction</td>
+</tr>
+<tr>
+<td>JWT Editor (Burp Extension)</td>
+<td>JWT header/payload manipulation and signature stripping</td>
+</tr>
+<tr>
+<td>jwt.io</td>
+<td>JWT decoding and structural inspection</td>
+</tr>
+<tr>
+<td>CrackStation / Hashcat</td>
+<td>Offline password hash cracking against recovered MD5 hashes</td>
+</tr>
+<tr>
+<td>FoxyProxy</td>
+<td>Browser-to-proxy traffic routing</td>
+</tr>
+<tr>
+<td>Firefox</td>
+<td>Manual testing browser</td>
+</tr>
+<tr>
+<td>Docker</td>
+<td>Local, isolated deployment of the Juice Shop target application</td>
+</tr>
+</tbody>
+</table>
+<h2 id="summary-of-findings">Summary of Findings</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Finding</th>
+<th>CWE</th>
+<th>Severity</th>
+<th>CVSS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Directory Listing Exposure</td>
+<td>CWE-548</td>
+<td>High</td>
+<td>7.5</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Sensitive Information Disclosure in Client-Side JavaScript</td>
+<td>CWE-922</td>
+<td>Medium</td>
+<td>5.3</td>
+</tr>
+<tr>
+<td>3</td>
+<td>SQL Injection — Authentication Bypass</td>
+<td>CWE-89</td>
+<td>Critical</td>
+<td>9.8</td>
+</tr>
+<tr>
+<td>4</td>
+<td>SQL Injection — Data Exfiltration via Search</td>
+<td>CWE-89</td>
+<td>Critical</td>
+<td>9.8</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Weak Password Hashing Algorithm (MD5)</td>
+<td>CWE-328</td>
+<td>Critical</td>
+<td>9.1</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Cross-Site Request Forgery — Password Change</td>
+<td>CWE-352</td>
+<td>High</td>
+<td>8.0</td>
+</tr>
+<tr>
+<td>7</td>
+<td>DOM-Based Cross-Site Scripting — Search</td>
+<td>CWE-79</td>
+<td>Medium</td>
+<td>5.4</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Broken Access Control — Basket Operations</td>
+<td>CWE-284</td>
+<td>High</td>
+<td>8.1</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Improper Input Validation — Basket Quantity</td>
+<td>CWE-20</td>
+<td>Medium</td>
+<td>6.5</td>
+</tr>
+<tr>
+<td>10</td>
+<td>File Upload Restriction Bypass</td>
+<td>CWE-434</td>
+<td>High</td>
+<td>8.8</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Insecure JWT Design and Implementation</td>
+<td>CWE-347</td>
+<td>High</td>
+<td>7.1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="remediation-summary">Remediation Summary</h2>
+<p><strong>General Recommendations</strong></p>
+<ul>
+<li>Enforce server-side authorization on every request — never trust a client-supplied identifier without validating it against the authenticated session.</li>
+<li>Replace all fast, general-purpose password hashing (MD5) with a purpose-built, adaptive algorithm (bcrypt, scrypt, or Argon2id) including per-user salting.</li>
+<li>Apply parameterized queries / prepared statements universally; eliminate all string-concatenated SQL.</li>
+<li>Implement anti-CSRF tokens on every state-changing request and require re-authentication (current password) for sensitive account changes.</li>
+<li>Apply strict output encoding and a restrictive Content-Security-Policy to close remaining XSS vectors.</li>
+<li>Enforce all file upload restrictions (type, size, content) server-side; never rely on client-side/UI-layer restrictions alone.</li>
+<li>Redesign JWT handling to avoid storing sensitive claims in the payload, use strong signing algorithms, and enforce short expiration windows.</li>
+</ul>
+<p><strong>Short Term (address immediately)</strong></p>
+<ul>
+<li>Finding 1 — Disable directory listing on the web server / static file handler.</li>
+<li>Finding 2 — Remove sensitive endpoint references and internal comments from client-shipped JavaScript bundles.</li>
+<li>Finding 5 — Replace MD5 with bcrypt/Argon2id and force a password reset for all existing accounts.</li>
+<li>Finding 6 — Require current-password re-verification server-side and implement CSRF tokens.</li>
+<li>Finding 10 — Enforce file type and size validation server-side, independent of any client-side check.</li>
+</ul>
+<p><strong>Medium Term</strong></p>
+<ul>
+<li>Findings 3 &amp; 4 — Migrate all database access to parameterized queries; introduce a SAST rule to flag string-built SQL.</li>
+<li>Finding 7 — Apply framework-level auto-escaping and a strict CSP; audit all <code>innerHTML</code>/unsafe DOM sinks.</li>
+<li>Finding 8 — Add object-ownership validation on every basket-related endpoint.</li>
+<li>Finding 9 — Add server-side quantity bounds validation and re-derive totals server-side rather than trusting client-submitted totals.</li>
+<li>Finding 11 — Redesign JWT claims and signing configuration; rotate the signing secret.</li>
+</ul>
+<p><strong>Long Term</strong></p>
+<ul>
+<li>Integrate SAST/DAST/SCA scanning into the CI/CD pipeline as a merge-blocking gate.</li>
+<li>Establish a recurring internal security assessment cadence (quarterly) in addition to periodic external penetration testing.</li>
+<li>Provide secure-coding training for all contributing developers, focused on the specific weakness classes identified in this report.</li>
+</ul>
+<hr />
+<h2 id="technical-finding-details">Technical Finding Details</h2>
+<h3 id="1-directory-listing-exposure">1. Directory Listing Exposure</h3>
+<p><strong>Description</strong></p>
+<p>During attack-surface mapping, the intercepting proxy's site map revealed a <code>/ftp</code> directory exposed on the application. Navigating to this path directly returned a raw directory listing rather than a 403/404 response, indicating that directory browsing was enabled on the web server for this path.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Burp Suite site map showing the /ftp directory discovered during crawling]</code></p>
+</blockquote>
+<p>Browsing into the exposed directory listed a set of files available for direct, unauthenticated download.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Directory listing of /ftp showing downloadable files]</code></p>
+</blockquote>
+<p>One of the exposed files, an internal markdown document, contained non-public business information (in this training instance, details framed as company acquisition notes) that should never have been reachable from an unauthenticated, public-facing path.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Contents of the exposed sensitive file]</code></p>
+</blockquote>
+<p><strong>Technical Root Cause</strong></p>
+<p>The web server (or static file middleware) was configured to serve directory indexes for a path that also happened to contain files not intended for public access. This is a classic case of a <strong>development/staging convenience setting</strong> (directory browsing, often enabled for internal file-sharing during development) surviving into a reachable environment.</p>
+<p><strong>Impact</strong></p>
+<p>Any unauthenticated visitor who guesses or discovers this path can enumerate and download every file placed there, without any access control check. Depending on what is stored in the directory, this can range from low-sensitivity static assets to business-critical documents, credentials, or backup files.</p>
+<p><strong>CWE ID:</strong> <a href="https://cwe.mitre.org/data/definitions/538.html">CWE-538: File and Directory Information Exposure</a></p>
+<p><strong>Severity:</strong> 7.5 (High)</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: CVSS calculator score breakdown for this finding]</code></p>
+</blockquote>
+<p><strong>Remediation</strong></p>
+<ul>
+<li>Disable directory listing/indexing at the web server or static-file-serving layer (e.g., <code>autoindex off;</code> in Nginx, or the framework's static-file middleware configuration).</li>
+<li>Move any files that must remain on the server but should not be publicly downloadable outside the web root, or behind an authenticated route with proper authorization checks.</li>
+<li>Run a periodic content-discovery scan (e.g., with a tool such as <code>ffuf</code> or <code>gobuster</code>) against production and staging environments to catch unintentionally exposed paths before an attacker does.</li>
+</ul>
+<hr />
+<h3 id="2-sensitive-information-disclosure-in-client-side-javascript">2. Sensitive Information Disclosure in Client-Side JavaScript</h3>
+<p><strong>Description</strong></p>
+<p>Inspecting the application's main client-side JavaScript bundle through the browser's developer tools (using the "pretty print" formatter to de-minify the code) revealed internal implementation details not intended for end users — including references to administrative routes and internal application logic embedded directly in the shipped bundle.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: De-minified main.js in browser DevTools showing internal route references]</code></p>
+</blockquote>
+<p>Searching the de-minified bundle for the keyword "admin" surfaced a reference to an administration panel route. Navigating directly to that route exposed an administrative interface, including user records and customer feedback moderation controls, with no additional authentication challenge encountered during testing.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Administration panel reached via the route discovered in main.js]</code></p>
+</blockquote>
+<p><strong>Technical Root Cause</strong></p>
+<p>Client-side JavaScript is, by definition, fully delivered to and readable by the end user's browser — it cannot hold secrets. This finding results from <strong>security-by-obscurity</strong>: the administrative route was not linked anywhere in the normal user interface, and the development team appears to have relied on that lack of a visible link as a substitute for an actual authorization check on the route itself.</p>
+<p><strong>Impact</strong></p>
+<p>Any user capable of reading their own browser's loaded JavaScript (which is to say, any user) can discover internal routes and application logic never intended for direct interaction. Where the discovered route itself lacks a proper server-side authorization check (as observed here), this becomes a direct path to unauthorized administrative access.</p>
+<p><strong>CWE ID:</strong> <a href="https://cwe.mitre.org/data/definitions/922.html">CWE-922: Insecure Storage of Sensitive Information</a></p>
+<p><strong>Severity:</strong> 5.3 (Medium)</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: CVSS calculator score breakdown for this finding]</code></p>
+</blockquote>
+<p><strong>Remediation</strong></p>
+<ul>
+<li>Never treat "not linked in the UI" as an access control — every sensitive route must independently enforce server-side authentication and role-based authorization.</li>
+<li>Minify and bundle production JavaScript with source maps disabled/restricted, reducing (though not eliminating) how easily internal structure can be reverse-engineered.</li>
+<li>Conduct a client-bundle content review as a standard pre-release step, specifically checking for internal comments, route names, or debug artifacts that reveal more than necessary about server-side structure.</li>
+</ul>
+<hr />
+<h3 id="3-sql-injection-authentication-bypass">3. SQL Injection — Authentication Bypass</h3>
+<p><strong>Description</strong></p>
+<p>The login form's email field was tested for SQL injection by submitting a classic tautology payload — <code>' OR 1=1 --</code> — in the email field, with an arbitrary value in the password field. The application authenticated the request successfully, logging the tester in as the first user record in the underlying database (in this application's seeded data, the administrator account).</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Login form submission with the ' OR 1=1 -- payload]</code></p>
+<p><code>[INSERT SCREENSHOT: Successful authentication as the admin account following the payload]</code></p>
+</blockquote>
+<p>To confirm the vulnerability systematically rather than relying on a single working payload, Burp Suite's Intruder tool was configured with a curated wordlist of common SQL injection authentication-bypass strings and run against the login endpoint to identify every variant that succeeded.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Burp Intruder attack results against the login endpoint, showing which payloads succeeded]</code></p>
+</blockquote>
+<p><strong>Technical Root Cause</strong></p>
+<p>The login query was constructed by directly concatenating the submitted email value into a SQL <code>WHERE</code> clause rather than using a parameterized query. The injected <code>' OR 1=1 --</code> payload closes the string literal early, appends a condition that is always true, and comments out the remainder of the original query (including the password check), causing the query to match every row in the users table and return the first one.</p>
+<pre><code class="language-sql">-- Resulting query after concatenation with the malicious input:
+SELECT * FROM Users WHERE email = '' OR 1=1 --' AND password = '...'
+-- The &quot;--&quot; comments out the password check entirely.
+</code></pre>
+<p><strong>Impact</strong></p>
+<p>This is a full authentication bypass requiring no valid credentials whatsoever. Because the query returns the first matching row and the application logic then trusts that row as "the authenticated user," an attacker is not just bypassing login — they are authenticating as whichever account the database happens to return first, which in many seeded/legacy schemas is the administrator.</p>
+<p><strong>CWE ID:</strong> <a href="https://cwe.mitre.org/data/definitions/89.html">CWE-89: SQL Injection</a></p>
+<p><strong>Severity:</strong> 9.8 (Critical)</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: CVSS calculator score breakdown for this finding]</code></p>
+</blockquote>
+<p><strong>Remediation</strong></p>
+<pre><code class="language-python"># Vulnerable
+query = f&quot;SELECT * FROM Users WHERE email='{email}' AND password='{password_hash}'&quot;
+
+# Remediated — parameterized query
+query = &quot;SELECT * FROM Users WHERE email = ? AND password = ?&quot;
+cursor.execute(query, (email, password_hash))
+</code></pre>
+<ul>
+<li>Migrate all authentication queries to parameterized statements or an ORM's built-in query builder; never concatenate user input into SQL.</li>
+<li>Add a Web Application Firewall (WAF) rule set as a defense-in-depth layer to flag and block common injection patterns at the network edge, without treating it as a substitute for fixing the underlying query.</li>
+<li>Add automated regression tests that specifically submit known SQL injection payloads to the login endpoint on every build, failing the pipeline if authentication ever succeeds with a malformed credential.</li>
+</ul>
+<hr />
+<h3 id="4-sql-injection-data-exfiltration-via-search">4. SQL Injection — Data Exfiltration via Search</h3>
+<p><strong>Description</strong></p>
+<p>The product search endpoint was tested for injection using both manual payloads and SQLMap, an automated SQL injection and database takeover tool. SQLMap successfully identified the search parameter as injectable and, once confirmed, was used to enumerate the full database schema.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Burp Suite capture of the vulnerable search request/endpoint]</code></p>
+<p><code>[INSERT SCREENSHOT: SQLMap confirming the injection point and identifying the database engine]</code></p>
+<p><code>[INSERT SCREENSHOT: SQLMap output listing enumerated database tables]</code></p>
+</blockquote>
+<p>With schema enumeration complete, SQLMap was directed to dump the contents of two specific tables: a table storing registered payment card records, and the primary user records table. Both were extracted successfully to CSV output.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: SQLMap dump output for the payment card table]</code></p>
+<p><code>[INSERT SCREENSHOT: SQLMap dump output for the user records table]</code></p>
+</blockquote>
+<p>Notably, payment card data was recovered in plaintext, while user passwords were stored in a hashed (though, per Finding 5, weakly hashed) form.</p>
+<p><strong>Technical Root Cause</strong></p>
+<p>As with Finding 3, the search feature constructs its underlying SQL query via direct string concatenation of the user-supplied search term, rather than a parameterized query. Unlike the login bypass, this injection point allowed full <code>UNION</code>-based data extraction because the search endpoint's query structure was more amenable to appending additional <code>SELECT</code> statements that SQLMap could exploit for arbitrary table access.</p>
+<p><strong>Impact</strong></p>
+<p>This finding represents the most severe class of outcome for an injection vulnerability: complete, unauthenticated read access to the application's backend database, including financial data (payment cards) stored without encryption. In a production context, this alone would constitute a reportable data breach under most data protection regulations.</p>
+<p><strong>CWE ID:</strong> <a href="https://cwe.mitre.org/data/definitions/89.html">CWE-89: SQL Injection</a></p>
+<p><strong>Severity:</strong> 9.8 (Critical)</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: CVSS calculator score breakdown for this finding]</code></p>
+</blockquote>
+<p><strong>Remediation</strong></p>
+<ul>
+<li>Parameterize the search query exactly as recommended for Finding 3 — this is the same root cause manifesting in a second endpoint, underscoring the need for a codebase-wide audit rather than a per-endpoint patch.</li>
+<li>Encrypt payment card data at rest (or, preferably, avoid storing raw card numbers entirely by using a tokenized reference from a PCI-compliant payment processor).</li>
+<li>Apply least-privilege database credentials to the application's runtime database user — a properly scoped account should not have permission to read tables unrelated to its function, limiting the blast radius even if an injection point is missed.</li>
+</ul>
+<hr />
+<h3 id="5-weak-password-hashing-algorithm">5. Weak Password Hashing Algorithm</h3>
+<p><strong>Description</strong></p>
+<p>Following the database extraction in Finding 4, the recovered password hashes were examined and identified as MD5 digests based on their fixed 32-character hexadecimal length and lack of any salt prefix. The hash set was submitted to CrackStation, an online rainbow-table lookup service, which successfully reversed several of the hashes back to their original plaintext passwords within seconds.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: CrackStation results showing recovered plaintext passwords from the MD5 hash set]</code></p>
+</blockquote>
+<p><strong>Technical Root Cause</strong></p>
+<p>MD5 is a fast, general-purpose cryptographic hash function designed for data integrity checking, not password storage. It performs no salting and can be computed at extremely high speed on modern hardware (billions of hashes per second on GPU-accelerated hardware), which makes both dictionary attacks and precomputed rainbow-table lookups highly effective. Because no per-user salt was applied, identical passwords across different user accounts also produce identical hash values, further simplifying attack.</p>
+<p><strong>Impact</strong></p>
+<p>Any breach of the underlying database — whether via the SQL injection in Finding 4, a misconfigured backup, or any other access path — immediately yields plaintext-recoverable credentials for a meaningful fraction of the user base. Because password reuse across services is common, this also creates downstream risk for those users' accounts on entirely unrelated platforms.</p>
+<p><strong>CWE ID:</strong> <a href="https://cwe.mitre.org/data/definitions/328.html">CWE-328: Use of Weak Hash</a></p>
+<p><strong>Severity:</strong> 9.1 (Critical)</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: CVSS calculator score breakdown for this finding]</code></p>
+</blockquote>
+<p><strong>Remediation</strong></p>
+<pre><code class="language-python"># Vulnerable
+import hashlib
+password_hash = hashlib.md5(password.encode()).hexdigest()
+
+# Remediated — bcrypt with per-password salt and tunable work factor
+import bcrypt
+password_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt(rounds=12))
+</code></pre>
+<ul>
+<li>Replace MD5 (or any general-purpose hash: SHA-1, SHA-256 used alone) with a purpose-built, adaptive password hashing algorithm — bcrypt, scrypt, or Argon2id — all of which incorporate salting and a tunable work factor by design.</li>
+<li>Force a password reset for all existing accounts once the migration is complete, since the historical MD5 hashes should be considered permanently compromised.</li>
+<li>Consider adding a server-side "pepper" (a secret value combined with the password before hashing, stored separately from the database) as an additional defense-in-depth layer against full database compromise.</li>
+</ul>
+<hr />
+<h3 id="6-cross-site-request-forgery-password-change">6. Cross-Site Request Forgery — Password Change</h3>
+<p><strong>Description</strong></p>
+<p>The account password-change functionality was tested for CSRF protection by capturing the change-password request in Burp Suite's Repeater tool and replaying it with modifications. The endpoint expects both the current password and the new password as parameters.</p>
+<p>When the current password field was populated with an intentionally incorrect value, the server correctly rejected the request with an error.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Password-change request with an incorrect current password, resulting in a rejected/error response]</code></p>
+</blockquote>
+<p>However, when the current-password parameter was removed from the request entirely (rather than supplied incorrectly), the server processed the request and successfully changed the account password — without ever validating that the requester actually knew the existing password.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Password-change request with the current-password parameter omitted, resulting in a successful change]</code></p>
+</blockquote>
+<p>For comparison, the baseline successful request (correct current password supplied) is shown below.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Baseline successful password-change request with the correct current password supplied]</code></p>
+</blockquote>
+<p><strong>Technical Root Cause</strong></p>
+<p>The server-side handler treats the current-password field as <strong>optional input to validate if present</strong>, rather than as a <strong>mandatory precondition for the entire operation</strong>. Combined with the complete absence of an anti-CSRF token on the request, this means the endpoint can be triggered by a forged cross-origin request (e.g., an auto-submitting form on an attacker-controlled page that a logged-in victim visits) with no current-password value included, silently changing the victim's password.</p>
+<p><em>Testing note:</em> modern Firefox's default cross-site cookie handling (SameSite defaults) made a live, browser-driven CSRF proof-of-concept harder to reproduce end-to-end during this assessment; the underlying server-side flaw (missing CSRF token, optional current-password check) was nonetheless confirmed directly via Burp Suite Repeater and remains exploitable via other vectors (older browsers, non-browser HTTP clients, or misconfigured CORS).</p>
+<p><strong>Impact</strong></p>
+<p>An attacker able to lure an authenticated victim to a malicious page (or inject the forged request through another vector) can silently take over the victim's account by resetting their password to an attacker-known value, without ever needing to know the original password.</p>
+<p><strong>CWE ID:</strong> <a href="https://cwe.mitre.org/data/definitions/352.html">CWE-352: Cross-Site Request Forgery (CSRF)</a></p>
+<p><strong>Severity:</strong> 8.0 (High)</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: CVSS calculator score breakdown for this finding]</code></p>
+</blockquote>
+<p><strong>Remediation</strong></p>
+<ul>
+<li>Make the current-password check a mandatory precondition for the entire operation, rejecting the request outright if the field is missing rather than only validating it when present.</li>
+<li>Implement a synchronizer anti-CSRF token on all state-changing requests (password change, email change, payment method change), validated server-side on every submission.</li>
+<li>Set <code>SameSite=Strict</code> (or at minimum <code>Lax</code>) on session cookies as a browser-level defense-in-depth control against cross-origin request forgery.</li>
+</ul>
+<hr />
+<h3 id="7-dom-based-cross-site-scripting-in-search">7. DOM-Based Cross-Site Scripting in Search</h3>
+<p><strong>Description</strong></p>
+<p>The product search field was tested with a series of payloads submitted directly into the browser's search bar, targeting the client-side JavaScript responsible for rendering search results into the page DOM.</p>
+<p>A baseline payload using a plain <code>&lt;script&gt;</code> tag was submitted first and did <strong>not</strong> execute, indicating that the application performs some sanitization against literal <code>&lt;script&gt;</code> tags specifically.</p>
+<pre><code class="language-html">&lt;script&gt;alert('XSS');&lt;/script&gt;
+</code></pre>
+<p><em>Result: sanitized — no execution.</em></p>
+<p>However, an <code>&lt;img&gt;</code> tag using the <code>onerror</code> event handler successfully triggered JavaScript execution, demonstrating that the sanitization in place was tag-specific rather than a comprehensive, context-aware output-encoding solution.</p>
+<pre><code class="language-html">&lt;img src=x onerror=alert('XSS')&gt;
+</code></pre>
+<p><em>Result: successful — alert box triggered.</em></p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Alert box triggered by the img onerror payload in the search field]</code></p>
+</blockquote>
+<p>Building on this confirmed sink, additional payloads demonstrated realistic attacker objectives beyond a proof-of-concept alert: a crafted anchor tag that silently redirects a victim to an attacker-controlled page,</p>
+<pre><code class="language-html">&lt;a href=&quot;https://attacker.example.com/&quot;&gt;Click here&lt;/a&gt;
+</code></pre>
+<p>an <code>onerror</code>-triggered redirect requiring no user interaction at all,</p>
+<pre><code class="language-html">&lt;img src=x onerror=&quot;window.location='https://attacker.example.com'&quot;&gt;
+</code></pre>
+<p>and a payload demonstrating session cookie theft, using an <code>iframe</code> with a <code>javascript:</code> URI to access <code>document.cookie</code>.</p>
+<pre><code class="language-html">&lt;iframe src=&quot;javascript:alert(document.cookie)&quot;&gt;
+</code></pre>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Cookie value exposed via the iframe/document.cookie payload]</code></p>
+</blockquote>
+<p><strong>Technical Root Cause</strong></p>
+<p>This is a <strong>DOM-based</strong> XSS vulnerability: the malicious payload never round-trips through the server at all. The client-side JavaScript reads the search term directly from the URL/DOM and writes it back into the page (e.g., via <code>innerHTML</code> or an equivalent unsafe DOM sink) without applying context-aware output encoding. The application's sanitization logic appears to specifically strip <code>&lt;script&gt;</code> tags via a naive filter, but fails to account for the much larger set of HTML attributes and elements (<code>onerror</code>, <code>onload</code>, <code>javascript:</code> URIs, etc.) that are equally capable of executing JavaScript.</p>
+<p><strong>Impact</strong></p>
+<p>Because this fires entirely client-side, a malicious link containing the payload can be sent to a victim (via email, chat, or a malicious third-party site) and will execute in the victim's authenticated browser session the moment they click it — no server compromise is needed. Demonstrated impact includes session cookie theft (enabling session hijacking) and forced redirection to attacker-controlled phishing pages.</p>
+<p><strong>CWE ID:</strong> <a href="https://cwe.mitre.org/data/definitions/79.html">CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')</a></p>
+<p><strong>Severity:</strong> 5.4 (Medium)</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: CVSS calculator score breakdown for this finding]</code></p>
+</blockquote>
+<p><strong>Remediation</strong></p>
+<pre><code class="language-javascript">// Vulnerable — unsafe DOM sink
+searchResultsElement.innerHTML = userSearchTerm;
+
+// Remediated — safe text insertion; no HTML/JS interpretation
+searchResultsElement.textContent = userSearchTerm;
+</code></pre>
+<ul>
+<li>Replace unsafe DOM sinks (<code>innerHTML</code>, <code>document.write</code>) with safe alternatives (<code>textContent</code>, <code>innerText</code>) anywhere user-controllable data is rendered.</li>
+<li>If rich-text rendering is genuinely required, use a dedicated, actively-maintained sanitization library (e.g., DOMPurify) rather than a hand-rolled tag filter — hand-rolled blocklists reliably miss attribute-based and URI-scheme-based vectors, exactly as observed here.</li>
+<li>Deploy a strict Content-Security-Policy (<code>script-src 'self'</code>) as a defense-in-depth layer that blocks inline event-handler execution even if a payload slips past output encoding.</li>
+</ul>
+<hr />
+<h3 id="8-broken-access-control-in-basket-operations">8. Broken Access Control in Basket Operations</h3>
+<p><strong>Description</strong></p>
+<p><strong>Viewing another user's basket:</strong> the basket-retrieval request was captured and its endpoint pattern identified as including the target basket's numeric identifier directly in the URL path. The identifier was modified to a different, sequential value than the tester's own basket ID.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Original basket-retrieval request showing the tester's own basket ID]</code></p>
+<p><code>[INSERT SCREENSHOT: Altered request with the basket ID changed to a different, sequential value]</code></p>
+</blockquote>
+<p>The server returned the full contents of a different account's basket, with no ownership validation performed against the requester's authenticated session.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Server response returning another account's basket contents]</code></p>
+<p><code>[INSERT SCREENSHOT: Application UI reflecting the improperly accessed basket, including the other account's items]</code></p>
+</blockquote>
+<p><strong>Adding items to another user's basket:</strong> a second, related flaw was identified in the "add to basket" flow. Submitting a request with the basket-owning account's own basket identifier behaved as expected.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Baseline add-to-basket request using the authenticated account's own basket ID]</code></p>
+</blockquote>
+<p>Simply changing the basket ID value to a different account's ID had no effect — the server appeared to validate the primary parameter. However, submitting the request with a <strong>duplicated</strong> basket-ID parameter (the legitimate one, plus a second one pointing at a different account) resulted in the item being added to the second, unauthorized basket.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Altered request with a duplicated basketId parameter pointing to a different account]</code></p>
+<p><code>[INSERT SCREENSHOT: Successful response confirming the item was added to the unauthorized basket]</code></p>
+<p><code>[INSERT SCREENSHOT: Application UI confirming the item now appears in the other account's basket]</code></p>
+</blockquote>
+<p><strong>Technical Root Cause</strong></p>
+<p>Both sub-findings share the same root cause: the server trusts a client-supplied object identifier (basket ID) without verifying it belongs to the authenticated session. The parameter-pollution variant (duplicated <code>basketId</code> parameter) further suggests that request parsing and the authorization check are not applied to the same resolved value — likely because whichever parameter instance the parsing layer resolves first differs from the one the business logic ultimately acts on, a common and easy-to-miss class of bug in frameworks that silently accept duplicate parameters.</p>
+<p><strong>Impact</strong></p>
+<p>Both read and write access-control failures are present: any authenticated user can view another user's basket contents (a privacy violation exposing another customer's purchasing activity) and can modify another user's basket by adding unwanted items — a functional integrity violation that, in a real e-commerce context, could be used for harassment, order manipulation, or as a pivot toward more damaging fraud.</p>
+<p><strong>CWE ID:</strong> <a href="https://cwe.mitre.org/data/definitions/284.html">CWE-284: Improper Access Control</a></p>
+<p><strong>Severity:</strong> 8.1 (High)</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: CVSS calculator score breakdown for this finding]</code></p>
+</blockquote>
+<p><strong>Remediation</strong></p>
+<ul>
+<li>Scope every basket query and mutation to the authenticated session's own user/basket ID server-side, regardless of what identifier value the client submits.</li>
+<li>Reject requests containing duplicate instances of the same parameter name, or explicitly define and test which instance the framework resolves, rather than leaving it to implicit, framework-default behavior.</li>
+<li>Add automated authorization tests ("can User A access User B's resource?") as a standard part of the endpoint test suite for every object-scoped route.</li>
+</ul>
+<hr />
+<h3 id="9-improper-input-validation-on-basket-quantity">9. Improper Input Validation on Basket Quantity</h3>
+<p><strong>Description</strong></p>
+<p>The basket-update request was captured and its quantity parameter modified to a negative integer value.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Original basket-update request with a normal positive quantity]</code></p>
+<p><code>[INSERT SCREENSHOT: Altered request with the quantity parameter set to -10]</code></p>
+</blockquote>
+<p>The server accepted the negative quantity without validation error and updated the basket accordingly.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Successful response confirming the negative-quantity update]</code></p>
+<p><code>[INSERT SCREENSHOT: Basket UI displaying a negative total price as a result]</code></p>
+</blockquote>
+<p>Proceeding through checkout with the negative-quantity basket, using the application's built-in digital wallet payment method, resulted in funds being <strong>credited</strong> to the tester's wallet balance rather than debited — effectively the inverse of a normal purchase.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Order confirmation showing the negative total processed through the digital wallet]</code></p>
+<p><code>[INSERT SCREENSHOT: Wallet balance increased following the negative-total "purchase"]</code></p>
+</blockquote>
+<p><strong>Technical Root Cause</strong></p>
+<p>The total-price calculation (<code>unit_price × quantity</code>) is computed without any server-side bounds check on the quantity value, and the resulting negative total is passed through to the payment/wallet logic without a sanity check confirming the amount is a valid, positive charge. This is fundamentally a <strong>design gap</strong>, not merely a missing input filter: the business logic never establishes an invariant that a "purchase" must always result in a non-negative transaction amount.</p>
+<p><strong>Impact</strong></p>
+<p>Direct financial impact: an attacker can repeat this transaction to arbitrarily inflate their wallet balance, effectively generating funds from nothing. In a production payment system, this is a critical business-logic flaw capable of causing direct monetary loss at scale, well beyond what a typical technical CVSS score alone communicates to non-technical stakeholders.</p>
+<p><strong>CWE ID:</strong> <a href="https://cwe.mitre.org/data/definitions/20.html">CWE-20: Improper Input Validation</a></p>
+<p><strong>Severity:</strong> 6.5 (Medium) — reflects technical exploitability; the business/financial impact should be communicated separately to stakeholders as high-priority regardless of the technical CVSS score.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: CVSS calculator score breakdown for this finding]</code></p>
+</blockquote>
+<p><strong>Remediation</strong></p>
+<pre><code class="language-python"># Vulnerable — no bounds check
+total = unit_price * quantity
+
+# Remediated — explicit invariant enforcement
+if quantity &lt; 1 or quantity &gt; MAX_QUANTITY_PER_ITEM:
+    raise InvalidQuantityError(&quot;Quantity must be a positive integer within allowed limits&quot;)
+total = unit_price * quantity
+if total &lt;= 0:
+    raise InvalidOrderError(&quot;Computed order total must be a positive amount&quot;)
+</code></pre>
+<ul>
+<li>Enforce a strict positive-integer bounds check on quantity server-side, independent of any client-side UI restriction (e.g., a spinner control's minimum value).</li>
+<li>Re-derive and validate the order total entirely server-side at checkout time — never trust a client-submitted total, and never allow a checkout to proceed if the computed total is not a sane, positive value.</li>
+<li>Add explicit business-logic test cases (negative quantity, zero quantity, extremely large quantity) to the checkout test suite.</li>
+</ul>
+<hr />
+<h3 id="10-file-upload-restriction-bypass">10. File Upload Restriction Bypass</h3>
+<p><strong>Description</strong></p>
+<p>The customer complaint/feedback form includes a file attachment feature with front-end enforced restrictions: a maximum file size of 100 KB and an allow-list limited to <code>.pdf</code> and <code>.zip</code> extensions.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: UI rejecting a file over the 100 KB limit]</code></p>
+<p><code>[INSERT SCREENSHOT: UI rejecting a file with a disallowed extension]</code></p>
+</blockquote>
+<p><strong>Extension bypass:</strong> a shell script (<code>payload-script.sh</code>) was renamed with a trailing allowed extension (<code>payload-script.sh.zip</code>) to pass the front-end's extension check.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: The renamed file passing the front-end extension check]</code></p>
+<p><code>[INSERT SCREENSHOT: Confirmation that the renamed file was accepted by the application]</code></p>
+</blockquote>
+<p><strong>Combined bypass via request interception:</strong> to fully restore the original malicious filename and exceed the size limit simultaneously, the upload request was intercepted with Burp Suite before it reached the server. The filename field within the multipart form data was edited back to the true <code>payload-script.sh</code> extension, and additional padding data was appended to the request body to exceed the 100 KB front-end limit.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Original intercepted multipart upload request]</code></p>
+<p><code>[INSERT SCREENSHOT: Altered request with filename restored and size limit exceeded]</code></p>
+</blockquote>
+<p>The server processed the altered request and accepted the upload, confirming that both the extension allow-list and the size limit were enforced only in the browser, with no equivalent check applied server-side.</p>
+<p><strong>Technical Root Cause</strong></p>
+<p>Both restrictions (file type, file size) exist exclusively as client-side JavaScript validation on the upload form. The server-side handler that ultimately writes the uploaded file to storage performs no independent verification of the file's actual extension, MIME type/content, or byte size — it implicitly trusts that any request reaching it has already passed the front-end's checks.</p>
+<p><strong>Impact</strong></p>
+<p>An attacker can upload arbitrary file types and sizes, including executable scripts. Depending on where uploaded files are stored and how they may later be accessed or executed by the server or other processes, this can range from a denial-of-service risk (unbounded storage consumption) to full remote code execution if the upload path is ever reachable/executable by the server or a downstream process.</p>
+<p><strong>CWE ID:</strong> <a href="https://cwe.mitre.org/data/definitions/434.html">CWE-434: Unrestricted Upload of File with Dangerous Type</a></p>
+<p><strong>Severity:</strong> 8.8 (High)</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: CVSS calculator score breakdown for this finding]</code></p>
+</blockquote>
+<p><strong>Remediation</strong></p>
+<ul>
+<li>Enforce file extension <strong>and</strong> content-type (MIME type) validation server-side, using an allow-list rather than a deny-list, and never trust the client-declared MIME type alone — verify actual file content (magic-byte/signature checking) where feasible.</li>
+<li>Enforce the maximum file size limit server-side as the request body is received, rejecting oversized uploads before they are fully written to disk.</li>
+<li>Store uploaded files outside the web root, with randomized filenames and no execute permissions, and serve them back only through an application-controlled download handler rather than direct static-file access.</li>
+</ul>
+<hr />
+<h3 id="11-insecure-jwt-design-and-implementation">11. Insecure JWT Design and Implementation</h3>
+<p><strong>Description</strong></p>
+<p>The user login flow's response was intercepted to examine how the application issues its session token. The login response was found to include a JSON Web Token (JWT), set via a cookie/header mechanism, used for subsequent session authentication.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Intercepted login response showing the JWT being set]</code></p>
+<p><code>[INSERT SCREENSHOT: Raw JWT value captured from the response]</code></p>
+</blockquote>
+<p>Decoding the token structure using jwt.io (a public, client-side-only decoding tool — no server interaction required, since JWTs are only signed, not encrypted) revealed that the token's payload included the user's email address, assigned role, and other account attributes in plaintext within the base64url-encoded body.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Decoded JWT header]</code>
+<code>[INSERT SCREENSHOT: Decoded JWT payload showing exposed user attributes]</code>
+<code>[INSERT SCREENSHOT: JWT signature section]</code></p>
+</blockquote>
+<p>Using the JWT Editor Burp Extension, the token's header was modified to remove the <code>alg</code> (algorithm) field, and the signature was stripped entirely. The <code>id</code> claim within the payload was then changed to a different user's numeric identifier. This modified, unsigned token was submitted in place of the original.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: JWT Editor showing the modified header/payload with the id claim changed]</code></p>
+</blockquote>
+<p>The server accepted the tampered token and returned data scoped to the impersonated user's identity rather than rejecting the malformed/unsigned token.</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: Original response scoped to the legitimate authenticated user]</code></p>
+<p><code>[INSERT SCREENSHOT: Modified response after token tampering, scoped to the impersonated user]</code></p>
+</blockquote>
+<p><strong>Technical Root Cause</strong></p>
+<p>Two distinct design weaknesses combine here. First, the JWT payload includes sensitive account attributes directly as claims — while JWTs are commonly (and correctly) treated as <strong>signed but not encrypted</strong>, this application appears to rely on the token's contents remaining private, which is an incorrect trust assumption for a format that any holder can freely decode. Second, and more critically, the server's token validation logic failed to reject a token with its <code>alg</code> field removed and no signature present — indicating either an <code>alg: none</code> acceptance vulnerability or a validation routine that does not enforce presence of a valid signature before trusting the payload's claims.</p>
+<p><strong>Impact</strong></p>
+<p>The signature-stripping bypass is a complete authentication and authorization control failure: it allows an attacker who has captured any single valid token to forge a token asserting <strong>any</strong> user identity, without needing that user's credentials, a valid signature, or the signing secret. Combined with the plaintext-readable claims, this also constitutes an information-disclosure issue independent of the tampering vulnerability, since any holder of a legitimate token (including, e.g., a token logged inadvertently by an intermediary proxy) can read another user's email and role directly.</p>
+<p><strong>CWE ID:</strong>
+- <a href="https://cwe.mitre.org/data/definitions/347.html">CWE-347: Improper Verification of Cryptographic Signature</a>
+- <a href="https://cwe.mitre.org/data/definitions/315.html">CWE-315: Cleartext Storage of Sensitive Information in a Cookie</a></p>
+<p><strong>Severity:</strong> 7.1 (High)</p>
+<blockquote>
+<p><code>[INSERT SCREENSHOT: CVSS calculator score breakdown for this finding]</code></p>
+</blockquote>
+<p><strong>Remediation</strong></p>
+<pre><code class="language-python"># Vulnerable — algorithm accepted from the token itself, no explicit allow-list
+decoded = jwt.decode(token, key, algorithms=jwt.get_unverified_header(token)['alg'])
+
+# Remediated — explicitly pin the expected algorithm; never trust the token's own header for this
+decoded = jwt.decode(token, key, algorithms=[&quot;HS512&quot;])  # explicit allow-list, &quot;none&quot; never accepted
+</code></pre>
+<ul>
+<li>Explicitly pin the accepted signing algorithm(s) on the server side (e.g., <code>HS512</code>) rather than deriving the expected algorithm from the token's own, attacker-controllable header — this is the standard root-cause fix for <code>alg: none</code> and algorithm-confusion style bypasses.</li>
+<li>Avoid placing sensitive attributes (email, role) directly in JWT claims where avoidable; where they must be included, treat the token as fully readable by its holder and design accordingly (never rely on claim confidentiality for security decisions).</li>
+<li>Enforce short token expiration windows and implement server-side revocation/rotation capability, since JWTs are otherwise valid and unrevokable for their full lifetime once issued.</li>
+<li>Store the signing secret in a dedicated secrets manager, rotate it periodically, and use a sufficiently long, random key appropriate for the chosen HMAC algorithm.</li>
+</ul>
+<hr />
+<h2 id="author">Author</h2>
+<p><strong>Report by:</strong> [Your Name]
+<strong>Institution / Program:</strong> [Your Institution / Training Program]
+<strong>Track:</strong> Cybersecurity Internship — Web Application Security Assessment
+<strong>Supervising Instructor:</strong> [Instructor Name]
+<strong>Target Application:</strong> OWASP Juice Shop (local Docker deployment)
+<strong>Assessment Type:</strong> Authorized, self-hosted training assessment — no production or third-party systems were tested.</p></div>
+</body>
+</html>

