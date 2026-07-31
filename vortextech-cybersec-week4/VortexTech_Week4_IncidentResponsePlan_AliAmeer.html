@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mini Incident Response Plan — Lumora Retail Data Exposure | Ali Ameer</title>
+<style>
+  :root{
+    --bg:#0b0d10;
+    --panel:#12151a;
+    --panel-2:#161a20;
+    --border:#242a33;
+    --text:#e7e9ec;
+    --muted:#9aa3af;
+    --yellow:#f5c518;
+    --red:#e5484d;
+    --green:#3ecf8e;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.65;
+  }
+  .wrap{max-width:900px;margin:0 auto;padding:48px 24px 96px;}
+
+  header.cover{
+    border:1px solid var(--border);
+    background:linear-gradient(160deg,#14171c,#0d0f13);
+    border-radius:14px;
+    padding:40px 36px;
+    margin-bottom:40px;
+    position:relative;
+    overflow:hidden;
+  }
+  header.cover::before{
+    content:"";
+    position:absolute; top:-40px; right:-40px;
+    width:220px;height:220px;border-radius:50%;
+    background:radial-gradient(circle,rgba(245,197,24,0.12),transparent 70%);
+  }
+  .eyebrow{
+    display:inline-block;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--yellow);
+    border:1px solid rgba(245,197,24,0.35);
+    padding:4px 10px;
+    border-radius:999px;
+    margin-bottom:16px;
+  }
+  h1.title{font-size:30px;margin:0 0 10px;line-height:1.25;}
+  .subtitle{color:var(--muted);font-size:15px;margin:0 0 24px;}
+  .meta-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:14px;
+    margin-top:24px;
+    border-top:1px solid var(--border);
+    padding-top:20px;
+  }
+  .meta-item .label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px;}
+  .meta-item .value{font-size:14px;font-weight:600;}
+
+  h2.section-title{
+    font-size:21px;
+    margin:44px 0 6px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .step-badge{
+    width:28px;height:28px;border-radius:8px;
+    background:var(--yellow);color:#111;
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:800;flex:none;
+  }
+  .section-desc{color:var(--muted);font-size:13.5px;margin:0 0 18px;}
+
+  .card{
+    border:1px solid var(--border);
+    background:var(--panel);
+    border-radius:12px;
+    padding:22px 24px;
+    margin-bottom:18px;
+  }
+  .card h3{margin:0 0 10px;font-size:16px;color:var(--yellow);}
+  .card p{margin:0 0 10px;color:#d7dae0;font-size:14.5px;}
+  .card p:last-child{margin-bottom:0;}
+  .card ul{margin:8px 0 0;padding-left:20px;color:#d7dae0;font-size:14.5px;}
+  .card li{margin-bottom:6px;}
+
+  .callout{
+    border-left:3px solid var(--red);
+    background:rgba(229,72,77,0.08);
+    padding:14px 18px;
+    border-radius:8px;
+    margin:18px 0;
+    font-size:14px;
+    color:#f3d4d5;
+  }
+  .callout.warn{border-left-color:var(--yellow);background:rgba(245,197,24,0.08);color:#f2e6bf;}
+  .callout.good{border-left-color:var(--green);background:rgba(62,207,142,0.08);color:#c9f2e0;}
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:14px 0 4px;
+    font-size:13.5px;
+  }
+  th,td{
+    border:1px solid var(--border);
+    padding:10px 12px;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{background:var(--panel-2);color:var(--yellow);font-size:12px;text-transform:uppercase;letter-spacing:.04em;}
+  tr:nth-child(even) td{background:rgba(255,255,255,0.02);}
+
+  .timeline{border-left:2px solid var(--border);margin:18px 0 4px 8px;padding-left:24px;}
+  .timeline-item{position:relative;margin-bottom:22px;}
+  .timeline-item::before{
+    content:"";
+    position:absolute;left:-30px;top:4px;
+    width:10px;height:10px;border-radius:50%;
+    background:var(--yellow);
+  }
+  .timeline-item .t{font-size:12px;color:var(--yellow);font-weight:700;letter-spacing:.03em;text-transform:uppercase;margin-bottom:4px;}
+  .timeline-item .who{font-weight:700;font-size:14.5px;margin-bottom:2px;}
+  .timeline-item .what{color:var(--muted);font-size:13.5px;}
+
+  .phase-tag{
+    display:inline-block;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:#111;
+    background:var(--yellow);
+    padding:3px 9px;
+    border-radius:6px;
+    margin-bottom:10px;
+    font-weight:700;
+  }
+
+  .prevent-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:8px;}
+  .prevent-card{
+    border:1px solid var(--border);
+    border-top:3px solid var(--green);
+    background:var(--panel);
+    border-radius:10px;
+    padding:18px 20px;
+  }
+  .prevent-card .num{color:var(--green);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
+  .prevent-card p{margin:0;font-size:14px;color:#d7dae0;}
+
+  footer{
+    margin-top:56px;
+    border-top:1px solid var(--border);
+    padding-top:20px;
+    color:var(--muted);
+    font-size:12.5px;
+    text-align:center;
+  }
+  code{
+    background:#1b1f26;
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:1px 6px;
+    font-size:13px;
+    color:var(--yellow);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="cover">
+    <span class="eyebrow">VortexTech Cybersecurity Internship — Week 4 of 4</span>
+    <h1 class="title">Mini Incident Response Plan<br>Lumora Retail — Exposed Customer Data API</h1>
+    <p class="subtitle">A structured, NIST-aligned incident response plan written for a hypothetical breach scenario, produced as the final deliverable of the VortexTech Cybersecurity Internship advanced track.</p>
+    <div class="meta-grid">
+      <div class="meta-item"><div class="label">Intern</div><div class="value">Ali Ameer</div></div>
+      <div class="meta-item"><div class="label">Program</div><div class="value">VortexTech Cybersecurity Internship 2026</div></div>
+      <div class="meta-item"><div class="label">Track</div><div class="value">Advanced — Week 4</div></div>
+      <div class="meta-item"><div class="label">Framework used</div><div class="value">NIST SP 800-61 Lifecycle</div></div>
+    </div>
+  </header>
+
+  <h2 class="section-title"><span class="step-badge">1</span>Scenario overview</h2>
+  <p class="section-desc">The hypothetical breach this plan responds to, invented for this exercise and loosely modeled on real-world API exposure incidents.</p>
+  <div class="card">
+    <h3>The company</h3>
+    <p><strong>Lumora Retail</strong> is a fictional mid-size online retailer with roughly 50 employees and around 120,000 registered customers. It runs a standard web application backed by a REST API, with payment processing handled entirely through a third-party processor so raw card data never touches its own database.</p>
+    <h3>What happened</h3>
+    <p>During a backend refactor, a developer disabled the authentication middleware on the <code>/api/v1/customers/export</code> endpoint to test a new bulk-export feature in a staging branch. That branch was accidentally promoted to production during a routine deploy, and the authentication check was never re-enabled. The endpoint sat publicly reachable, with no login required, for roughly six days before anyone noticed.</p>
+    <h3>What was exposed</h3>
+    <ul>
+      <li>Full name, email address, and phone number for approximately 120,000 customers</li>
+      <li>Shipping addresses and order history metadata (items, dates, order totals)</li>
+      <li>Bcrypt-hashed passwords (not plaintext)</li>
+      <li>No full payment card numbers — card data was tokenized by the payment processor and never stored locally</li>
+    </ul>
+  </div>
+
+  <h2 class="section-title"><span class="step-badge">2</span>NIST incident response lifecycle applied</h2>
+  <p class="section-desc">The plan below follows the six phases of the NIST SP 800-61 incident handling framework: Preparation, Detection &amp; Analysis, Containment, Eradication, Recovery, and Post-Incident Activity (Lessons Learned).</p>
+
+  <div class="card">
+    <span class="phase-tag">Phase 1 — Preparation</span>
+    <h3>What should already have been in place</h3>
+    <p>This is what the plan assumes existed (or should have existed) before the breach, since preparation happens before an incident, not during one.</p>
+    <ul>
+      <li>A maintained inventory of every public-facing API endpoint, including which ones require authentication</li>
+      <li>An incident response team with named roles: an IR lead, an engineering lead, a communications owner, and a legal/compliance contact</li>
+      <li>Automated monitoring and alerting on API traffic, tuned to flag anomalous outbound data volume, not just downtime</li>
+      <li>Strict separation between staging and production environments, so a staging build cannot silently reach production</li>
+      <li>A published <code>security@lumoraretail.com</code> contact and a basic responsible-disclosure policy, so external researchers have somewhere to report issues instead of posting them publicly</li>
+      <li>Tested backup and restore procedures for the customer database</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <span class="phase-tag">Phase 2 — Detection &amp; Analysis</span>
+    <h3>How the breach is realistically discovered</h3>
+    <p>Two signals arrive close together. An independent security researcher, who found the endpoint while scanning for exposed APIs, emails <code>security@lumoraretail.com</code> with a handful of sample records as proof and a responsible disclosure note. Around the same time, the on-call engineer notices an unusual spike in outbound bandwidth from the API server on the monitoring dashboard, without an obvious cause.</p>
+    <h3>Initial investigation steps</h3>
+    <ul>
+      <li>The IR lead is paged and opens a formal incident ticket, classifying it provisionally as <strong>High severity</strong> pending scope confirmation</li>
+      <li>The researcher's report is verified: the sample records are checked against the production database to confirm authenticity, and the endpoint is reproduced in a controlled, non-production clone rather than touched live in prod</li>
+      <li>API gateway and WAF logs are pulled to establish the exposure window, the requesting IP addresses, request volume, and which fields the responses actually returned</li>
+      <li>Based on the logs, severity is upgraded to <strong>Critical</strong> once it's confirmed the endpoint had no authentication and had been reachable for six days</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <span class="phase-tag">Phase 3 — Containment</span>
+    <h3>Stopping the breach from spreading further</h3>
+    <ul>
+      <li>The <code>/api/v1/customers/export</code> route is immediately disabled via a feature flag at the API gateway, without requiring a full redeploy</li>
+      <li>A WAF rule is pushed to block any request to that path regardless of flag state, as a second layer of containment</li>
+      <li>All active customer session tokens are invalidated as a precaution, in case any were enumerable through the exposed data</li>
+      <li>Access and request logs from the exposure window are snapshotted and preserved before any remediation touches the system, to protect forensic evidence</li>
+      <li>The affected API server instance is isolated from write access to unrelated internal systems while the investigation confirms whether lateral movement occurred (in this scenario, it did not)</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <span class="phase-tag">Phase 4 — Eradication</span>
+    <h3>Removing the root cause</h3>
+    <ul>
+      <li>The code path that allowed authentication middleware to be disabled outside of a controlled staging environment is identified and rewritten so that removal of the auth check fails the build</li>
+      <li>A corrected, peer-reviewed build is prepared, with a specific test added that asserts every route under <code>/api/v1/</code> requires authentication</li>
+      <li>As a precaution, all customer passwords are force-reset even though only bcrypt hashes were exposed, since hashes can still be attacked offline given enough time</li>
+      <li>A check is added to the CI/CD pipeline that blocks any deployment where an API route is missing a required auth decorator or its corresponding test</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <span class="phase-tag">Phase 5 — Recovery</span>
+    <h3>Safely restoring normal operations</h3>
+    <ul>
+      <li>The corrected build is deployed through the normal CI/CD pipeline with the new security gate active, not through an emergency manual push</li>
+      <li>The export endpoint is re-enabled gradually, behind authentication, rate limiting, and WAF rules, and is monitored closely for the first 48 hours</li>
+      <li>A focused external re-scan (including a re-test by the reporting researcher, if willing) confirms the endpoint is no longer reachable without valid credentials</li>
+      <li>API traffic and error rates are held under heightened monitoring for 30 days following the fix, with a lower alert threshold than normal</li>
+      <li>The incident ticket is closed only after the IR lead confirms containment, eradication, and recovery steps are all verified, not just deployed</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <span class="phase-tag">Phase 6 — Post-Incident Activity (Lessons Learned)</span>
+    <h3>What the post-incident review concludes</h3>
+    <p>A blameless post-incident review is held within 5 to 10 business days. It's expected to conclude that the root cause was config drift between staging and production with no automated safeguard against it, and that internal monitoring only caught the anomaly around the same time an external researcher had already found and reported it, which is treated as the more serious gap.</p>
+    <h3>Changes the review is expected to drive</h3>
+    <ul>
+      <li>Make the CI/CD authentication gate from the Eradication phase a permanent, mandatory part of every deployment, not a one-off fix</li>
+      <li>Physically or logically separate staging and production configuration and secrets so a staging build cannot be promoted by accident</li>
+      <li>Lower the alert threshold for outbound data volume anomalies so internal monitoring would have caught this before an outsider did</li>
+      <li>Formalize the responsible-disclosure process the researcher used informally, into a documented policy with a defined response SLA</li>
+      <li>Run a tabletop incident response exercise quarterly so the team isn't executing this plan for the first time during a real incident</li>
+    </ul>
+  </div>
+
+  <h2 class="section-title"><span class="step-badge">3</span>Internal communication plan</h2>
+  <p class="section-desc">Who gets notified, and roughly when, from the moment the incident is confirmed.</p>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="t">T+0 to 15 minutes</div>
+      <div class="who">On-call engineer &amp; IR lead</div>
+      <div class="what">Paged immediately once the anomaly or the researcher's report is confirmed as credible. Incident ticket opened.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="t">T+30 minutes</div>
+      <div class="who">Head of Engineering &amp; CEO</div>
+      <div class="what">Briefed on the confirmed scope, severity, and initial containment actions already underway.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="t">T+2 hours</div>
+      <div class="who">Legal &amp; compliance</div>
+      <div class="what">Looped in to assess regulatory notification obligations, since customer PII was exposed across an unknown number of jurisdictions.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="t">T+4 to 6 hours</div>
+      <div class="who">Support &amp; PR teams</div>
+      <div class="what">Briefed internally with approved talking points, so they can handle inbound questions consistently. No public statement yet at this point.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="t">Within 72 hours</div>
+      <div class="who">Relevant data protection authority</div>
+      <div class="what">Notified if legally required once scope is confirmed, in line with the general 72-hour reporting expectation under regulations such as GDPR, subject to legal counsel's guidance for the specific jurisdictions involved.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="t">Within 3 to 5 days</div>
+      <div class="who">Affected customers</div>
+      <div class="what">Notified directly by email: what happened, what data was involved, what wasn't exposed (full card numbers), and what action to take (password reset, already enforced).</div>
+    </div>
+  </div>
+  <div class="callout warn">This is a general internal communication sequence, not legal advice. Actual notification deadlines and requirements vary by jurisdiction and by the specific data protection laws that apply to a real company's customer base.</div>
+
+  <h2 class="section-title"><span class="step-badge">4</span>Preventative measures</h2>
+  <p class="section-desc">Tied directly to the root cause: an authentication check that was disabled in staging and silently promoted to production.</p>
+  <div class="prevent-grid">
+    <div class="prevent-card">
+      <div class="num">Measure 1</div>
+      <p>Add a CI/CD deployment gate that automatically fails any build where an API route is missing its required authentication middleware or corresponding test, so a misconfiguration like this can't reach production undetected again.</p>
+    </div>
+    <div class="prevent-card">
+      <div class="num">Measure 2</div>
+      <p>Enforce strict separation between staging and production environments, secrets, and feature flags, so a staging configuration can never be promoted to production without an explicit, reviewed step.</p>
+    </div>
+    <div class="prevent-card">
+      <div class="num">Measure 3</div>
+      <p>Stand up continuous external attack-surface monitoring, or a lightweight formal responsible-disclosure program, so exposed endpoints are caught by the company itself before or at the same time an outside party finds them.</p>
+    </div>
+  </div>
+
+  <h2 class="section-title"><span class="step-badge">5</span>Quick reference — port/service risk was Week 2's lens, this is the API equivalent</h2>
+  <p class="section-desc">Just as Week 2 mapped open ports to risk, this table maps the key assets involved in this incident to their risk level and the control that should protect them.</p>
+  <table>
+    <tr><th>Asset</th><th>Risk</th><th>Primary control</th></tr>
+    <tr><td>Unauthenticated export endpoint</td><td>Critical</td><td>Mandatory auth middleware, enforced by CI/CD gate</td></tr>
+    <tr><td>Bcrypt password hashes</td><td>Medium</td><td>Force reset after exposure; strong hashing already in place</td></tr>
+    <tr><td>Customer PII (name, address, phone)</td><td>High</td><td>Access control on export routes; rate limiting; monitoring</td></tr>
+    <tr><td>Payment data</td><td>Low (in this scenario)</td><td>Tokenized by third-party processor, never stored locally</td></tr>
+    <tr><td>Staging→production promotion path</td><td>Critical</td><td>Environment isolation; no manual/accidental promotion</td></tr>
+  </table>
+
+  <footer>
+    Ali Ameer &middot; BS Information Technology, GC University Faisalabad (Class of 2025) &middot; VortexTech Cybersecurity Internship 2026 &middot; Advanced Track, Week 4 of 4<br>
+    This is a hypothetical scenario written for training purposes as part of an internship deliverable. No real company, breach, or individual is referenced.
+  </footer>
+
+</div>
+</body>
+</html>
